@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dai8d5ts2c8wu"
+path="res://.godot/imported/ak reload(1).mp3-ce95ad5e0f492098a042caa2e4c5c6e5.mp3str"
+
+[deps]
+
+source_file="res://sounds/ak reload(1).mp3"
+dest_files=["res://.godot/imported/ak reload(1).mp3-ce95ad5e0f492098a042caa2e4c5c6e5.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

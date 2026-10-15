@@ -1,0 +1,102 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Mohammad`s FPS remake"
+run/main_scene="uid://gc0a60euwshw"
+config/features=PackedStringArray("4.7", "Mobile")
+run/max_fps=120
+config/icon="res://icon.svg"
+
+[autoload]
+
+Global="*uid://bpxxfv8nipbh7"
+WeaponPaths="*uid://bt3krgmydmrec"
+TpWeaponPaths="*uid://2dtr3eien7ya"
+NetworkManager="*uid://cour5swharejc"
+Settings="*uid://dcoi4dshvo5k0"
+Warmup="*uid://c2s2ear4algng"
+Loadout="*uid://qlc4q4gqnlm7"
+
+[debug_draw_3d]
+
+settings/addon_root_folder="res://addons/debug_draw_3d"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/frame_pacing/android/enable_frame_pacing=false
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/StyleboxFancy/plugin.cfg", "res://addons/control_shadows/plugin.cfg", "res://addons/godotx_health_bar/plugin.cfg", "res://addons/mergingmeshes/plugin.cfg", "res://addons/sky_3d/plugin.cfg")
+
+[global_group]
+
+spawn_points=""
+hud=""
+
+[input]
+
+crouch={
+"deadzone": 0.2,
+"events": []
+}
+jump={
+"deadzone": 0.2,
+"events": []
+}
+sprint={
+"deadzone": 0.2,
+"events": []
+}
+fire={
+"deadzone": 0.2,
+"events": []
+}
+reload={
+"deadzone": 0.2,
+"events": []
+}
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[physics]
+
+2d/run_on_separate_thread=true
+3d/run_on_separate_thread=true
+3d/physics_engine="Jolt Physics"
+3d/solver/solver_iterations=10
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+lights_and_shadows/directional_shadow/size=1024
+lights_and_shadows/directional_shadow/size.mobile=1024
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=0
+textures/default_filters/anisotropic_filtering_level=0
+anti_aliasing/quality/msaa_2d=1
+anti_aliasing/quality/msaa_3d=1
+scaling_3d/scale=0.7
+scaling_3d/fsr_sharpness=0.0
+textures/default_filters/texture_mipmap_bias=1.25
+occlusion_culling/use_occlusion_culling=true
+mesh_lod/lod_change/threshold_pixels=3.0
+lights_and_shadows/positional_shadow/atlas_size=1024
+lights_and_shadows/positional_shadow/atlas_size.mobile=1024

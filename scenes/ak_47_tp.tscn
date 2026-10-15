@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cqiq1kwraq7fg"]
+
+[ext_resource type="PackedScene" uid="uid://bd65s66w4a8fn" path="res://models/ak47-tp/akm.glb" id="1_wvknb"]
+
+[node name="weapon" type="Node3D" unique_id=1330354942]
+
+[node name="Sketchfab_Scene" parent="." unique_id=1042945362 instance=ExtResource("1_wvknb")]
+
+[node name="muzzle" type="Node3D" parent="." unique_id=758568132]
+transform = Transform3D(-1.3113417e-08, 0, -0.3, 0, 0.3, 0, 0.3, 0, -1.3113417e-08, 0, 0.082770914, -0.6546862)
+
+[node name="ScopeMount" type="Node3D" parent="." unique_id=764245446]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11857009, -0.09402382)
+
+[node name="handle" type="Node3D" parent="." unique_id=173843796]
+transform = Transform3D(-0.9966374, -0.081938304, 8.725027e-08, -0.08177661, 0.99467075, 0.062790625, -0.005145044, 0.062579475, -0.9980267, -0.0834602, 0.036452413, -0.2849651)

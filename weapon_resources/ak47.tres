@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://b25vw0t3ohnsl"]
+
+[ext_resource type="Script" uid="uid://b3ttjw2qi1jnr" path="res://scripts/WeaponData.gd" id="1_7wa8m"]
+[ext_resource type="PackedScene" uid="uid://c6wgbq16al7qx" path="res://scenes/2x_scope.tscn" id="1_p6lk3"]
+[ext_resource type="PackedScene" uid="uid://bjl7mq13gtdsu" path="res://scenes/ak_47.tscn" id="2_esfdx"]
+
+[resource]
+script = ExtResource("1_7wa8m")
+weapon_scene = ExtResource("2_esfdx")
+hold_position = Vector3(0.094, -0.247, -0.17)
+weapon_name = "ak47"
+type = "rifle"
+damage = 15
+bob_amount = 0.005
+bob_offset = Vector3(0.1, -0.019, -0.065)
+bob_rotation = Vector3(0, 90, 0)
+cam_recoil_up = 1.2
+cam_recoil_side = 0.45
+available_scopes = Array[PackedScene]([ExtResource("1_p6lk3")])
+scope_names = Array[String](["2x_scope"])
+clip_ray_length = -0.959

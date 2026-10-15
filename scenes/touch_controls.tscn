@@ -1,0 +1,344 @@
+[gd_scene format=3 uid="uid://dyk5f6hjd3nxy"]
+
+[ext_resource type="Script" uid="uid://dehn4fb7ndb5x" path="res://scripts/joystick_base.gd" id="1_6wx45"]
+[ext_resource type="Script" uid="uid://doiqv1vil7qr0" path="res://scripts/gameplay_buttons.gd" id="1_notdv"]
+[ext_resource type="Script" uid="uid://e4jcoq26iuuo" path="res://scripts/look_area.gd" id="2_c1tq5"]
+[ext_resource type="Texture2D" uid="uid://b88xnqw4sqs8n" path="res://models/textures/joystick_circle_pad_a.png" id="3_i7au1"]
+[ext_resource type="Texture2D" uid="uid://cwh8wiymhmbqx" path="res://models/textures/jump.png" id="3_notdv"]
+[ext_resource type="Texture2D" uid="uid://dy3mcotq4swj6" path="res://models/textures/crouch.png" id="5_c1tq5"]
+[ext_resource type="Texture2D" uid="uid://bm7rsonasv3mg" path="res://models/textures/joystick_circle_nub_a.png" id="5_lkmae"]
+[ext_resource type="Script" uid="uid://wsi4i2x7jbao" path="res://scripts/jump_button.gd" id="6_j2vku"]
+[ext_resource type="Texture2D" uid="uid://86k718sdo7iq" path="res://models/textures/button_circle.png" id="8_j2vku"]
+[ext_resource type="Script" uid="uid://c6kf4kews2vhw" path="res://scripts/crouch_button.gd" id="9_tve8x"]
+[ext_resource type="Script" uid="uid://c74ognsdotwb0" path="res://scripts/shoot_button.gd" id="11_j3oes"]
+[ext_resource type="Texture2D" uid="uid://bx7hh6x74aj1n" path="res://models/textures/—Pngtree—vector bullet icon_4153624.png" id="12_pvbyl"]
+[ext_resource type="Texture2D" uid="uid://ush6qmw6agfm" path="res://models/textures/—Pngtree—reload vector icon_4015267.png" id="13_4wpbc"]
+[ext_resource type="Script" uid="uid://bh5y6v403v81g" path="res://scripts/reload_button.gd" id="13_pvbyl"]
+[ext_resource type="Script" uid="uid://cll3ygfy18nup" path="res://scripts/sprint_button.gd" id="15_s570s"]
+[ext_resource type="Texture2D" uid="uid://dkjg4ymim8dex" path="res://models/textures/sprint.png" id="16_7qoim"]
+[ext_resource type="Script" uid="uid://d0w1kawcd3oy8" path="res://scripts/crosshair.gd" id="17_7qoim"]
+[ext_resource type="Script" uid="uid://dewecitswqwx7" path="res://scripts/aim.gd" id="18_s5gem"]
+[ext_resource type="Texture2D" uid="uid://bhfxlruf1lwof" path="res://models/textures/icon_crosshair.png" id="19_h0mma"]
+[ext_resource type="Script" uid="uid://bxh4ngfdgcy1a" path="res://addons/godotx_health_bar/runtime/godotx_health_bar_control.gd" id="20_kc8m0"]
+[ext_resource type="Script" uid="uid://di40il8m7meey" path="res://addons/godotx_health_bar/runtime/godotx_health_bar_style.gd" id="21_xlgkt"]
+[ext_resource type="Script" uid="uid://ej2416acryl2" path="res://scripts/HealthBinder.gd" id="22_byp8s"]
+
+[sub_resource type="Resource" id="Resource_g7b7a"]
+script = ExtResource("21_xlgkt")
+roundness = 0.0
+fill_color = Color(0.98134905, 0.9994287, 0.9833346, 1)
+metadata/_custom_type_script = "uid://di40il8m7meey"
+
+[node name="touch_controls" type="CanvasLayer" unique_id=2048230818]
+
+[node name="gameplay" type="Control" parent="." unique_id=1683330501]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_notdv")
+
+[node name="look_area" type="Control" parent="gameplay" unique_id=920906172]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_bottom = 360.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("2_c1tq5")
+sensitivity = 0.5
+
+[node name="JoystickBase" type="TextureRect" parent="gameplay" unique_id=604010266]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.054999996
+anchor_top = 0.56233335
+anchor_right = 0.054999996
+anchor_bottom = 0.56233335
+offset_left = 0.5999985
+offset_top = 0.11999512
+offset_right = 250.6
+offset_bottom = 250.12
+grow_vertical = 0
+texture = ExtResource("3_i7au1")
+expand_mode = 1
+script = ExtResource("1_6wx45")
+knob_path = NodePath("JoystickKnob")
+metadata/_edit_use_anchors_ = true
+
+[node name="JoystickKnob" type="TextureRect" parent="gameplay/JoystickBase" unique_id=35634050]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -62.5
+offset_top = -62.5
+offset_right = 62.5
+offset_bottom = 62.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_lkmae")
+expand_mode = 1
+
+[node name="jump" type="Control" parent="gameplay" unique_id=1910985126]
+layout_mode = 1
+anchor_left = 0.882
+anchor_top = 0.5
+anchor_right = 0.882
+anchor_bottom = 0.5
+offset_left = 0.039916992
+offset_top = -3.0
+offset_right = 40.039917
+offset_bottom = 37.0
+script = ExtResource("6_j2vku")
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/jump" unique_id=257512843]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.407
+anchor_bottom = 0.407
+offset_left = -15.0
+offset_top = -11.279999
+offset_right = 137.0
+offset_bottom = 139.72
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/jump" unique_id=482224763]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.27800003
+anchor_top = 0.65000004
+anchor_right = 0.27800003
+anchor_bottom = 0.65000004
+offset_left = -19.11997
+offset_top = -33.000008
+offset_right = 118.88003
+offset_bottom = 155.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_notdv")
+expand_mode = 1
+
+[node name="crouch" type="Control" parent="gameplay" unique_id=1068800047]
+layout_mode = 1
+anchor_left = 0.73700005
+anchor_top = 0.86700004
+anchor_right = 0.73700005
+anchor_bottom = 0.86700004
+offset_left = 0.6399536
+offset_top = -0.24005127
+offset_right = 40.639954
+offset_bottom = 39.75995
+script = ExtResource("9_tve8x")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/crouch" unique_id=1462227915]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.825
+anchor_top = -1.1250001
+anchor_right = -0.825
+anchor_bottom = -1.1250001
+offset_top = -1.1444092e-05
+offset_right = 123.0
+offset_bottom = 122.999985
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/crouch" unique_id=2069928874]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.125
+anchor_top = -0.52500004
+anchor_right = -0.125
+anchor_bottom = -0.52500004
+offset_top = -3.999998
+offset_right = 64.0
+offset_bottom = 92.0
+mouse_filter = 2
+texture = ExtResource("5_c1tq5")
+expand_mode = 1
+
+[node name="shoot" type="Control" parent="gameplay" unique_id=2051093079]
+layout_mode = 1
+anchor_left = 0.105000004
+anchor_top = 0.03477778
+anchor_right = 0.105000004
+anchor_bottom = 0.03477778
+offset_left = -0.40000916
+offset_top = -0.040000916
+offset_right = 39.59999
+offset_bottom = 39.96
+script = ExtResource("11_j3oes")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/shoot" unique_id=1365679274]
+layout_mode = 1
+offset_right = 171.0
+offset_bottom = 171.0
+texture = ExtResource("8_j2vku")
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/shoot" unique_id=546611184]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.725
+anchor_right = 0.5
+anchor_bottom = 0.725
+offset_left = -3.0
+offset_right = 121.0
+offset_bottom = 124.0
+mouse_filter = 2
+texture = ExtResource("12_pvbyl")
+expand_mode = 1
+
+[node name="reload" type="Control" parent="gameplay" unique_id=31181950]
+layout_mode = 1
+anchor_left = 0.6
+anchor_top = 0.8666667
+anchor_right = 0.6
+anchor_bottom = 0.8666667
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("13_pvbyl")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/reload" unique_id=1823494859]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.6
+anchor_top = -0.975
+anchor_right = -0.6
+anchor_bottom = -0.975
+offset_right = 127.0
+offset_bottom = 127.0
+texture = ExtResource("8_j2vku")
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/reload" unique_id=1031206025]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.275
+anchor_top = -0.77500004
+anchor_right = -0.275
+anchor_bottom = -0.77500004
+offset_right = 106.0
+offset_bottom = 109.0
+mouse_filter = 2
+texture = ExtResource("13_4wpbc")
+expand_mode = 1
+
+[node name="sprint" type="Control" parent="gameplay" unique_id=686090053]
+layout_mode = 1
+anchor_left = 0.8953125
+anchor_top = 0.8041667
+anchor_right = 0.8953125
+anchor_bottom = 0.8041667
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("15_s570s")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/sprint" unique_id=825614967]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.625
+anchor_top = -0.3
+anchor_right = -0.625
+anchor_bottom = -0.3
+offset_right = 125.0
+offset_bottom = 125.0
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/sprint" unique_id=1662317379]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.35000002
+anchor_bottom = 0.35000002
+offset_right = 76.0
+offset_bottom = 76.0
+mouse_filter = 2
+texture = ExtResource("16_7qoim")
+expand_mode = 1
+
+[node name="crosshair" type="Control" parent="gameplay" unique_id=1595908634]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("17_7qoim")
+
+[node name="aim" type="Control" parent="gameplay" unique_id=793229051]
+layout_mode = 1
+anchor_left = 0.7390625
+anchor_top = 0.072222225
+anchor_right = 0.73934376
+anchor_bottom = 0.072500005
+offset_right = 39.640015
+offset_bottom = 39.799995
+script = ExtResource("18_s5gem")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/aim" unique_id=1168796578]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = -0.675
+anchor_bottom = -0.675
+offset_right = 171.0
+offset_bottom = 171.0
+texture = ExtResource("8_j2vku")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/aim" unique_id=164455247]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.86200005
+anchor_top = 0.25
+anchor_right = 0.86200005
+anchor_bottom = 0.25
+offset_left = 0.019996643
+offset_right = 102.02
+offset_bottom = 97.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("19_h0mma")
+metadata/_edit_use_anchors_ = true
+
+[node name="GodotxHealthBarControl" type="Control" parent="gameplay" unique_id=934796149 groups=["hud"]]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -179.0
+offset_right = 179.0
+offset_bottom = 65.0
+grow_horizontal = 2
+script = ExtResource("20_kc8m0")
+style = SubResource("Resource_g7b7a")
+metadata/_custom_type_script = "uid://bxh4ngfdgcy1a"
+
+[node name="Node" type="Node" parent="gameplay/GodotxHealthBarControl" unique_id=1372266517]
+script = ExtResource("22_byp8s")

@@ -1,0 +1,505 @@
+[gd_scene format=3 uid="uid://gc0a60euwshw"]
+
+[ext_resource type="Script" uid="uid://dvx8411xikbrd" path="res://scripts/lobby.gd" id="1_nqcc7"]
+[ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="1_q60fs"]
+[ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="2_nqcc7"]
+[ext_resource type="PackedScene" uid="uid://cguqfk61v42xd" path="res://scenes/loading.tscn" id="4_nqcc7"]
+
+[sub_resource type="Resource" id="Resource_xrv66"]
+script = ExtResource("1_q60fs")
+color = Color(0.46614927, 0.7135701, 0.9947174, 1)
+width_left = 10
+width_top = 10
+width_right = 10
+width_bottom = 10
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_apkv3"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+script = ExtResource("2_nqcc7")
+color = Color(0.0015846869, 0, 0.10422378, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_xrv66")])
+
+[sub_resource type="Resource" id="Resource_gyc6d"]
+script = ExtResource("1_q60fs")
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_g7b7a"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_gyc6d")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_omrgh"]
+script = ExtResource("1_q60fs")
+color = Color(0.13333334, 0.56078434, 0.972549, 1)
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_ncsg4"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_07nfq"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_oipnb"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_yad6j"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_bpo87"]
+script = ExtResource("1_q60fs")
+width_left = 10
+width_top = 10
+width_right = 10
+width_bottom = 10
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_xrv66"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_bpo87")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_q60fs"]
+script = ExtResource("1_q60fs")
+color = Color(0.46614927, 0.7135701, 0.9947174, 1)
+width_left = 7
+width_top = 7
+width_right = 7
+width_bottom = 7
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_bpo87"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_q60fs")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_nqcc7"]
+script = ExtResource("1_q60fs")
+width_left = 10
+width_top = 10
+width_right = 10
+width_bottom = 10
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_pc087"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_nqcc7")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_apkv3"]
+script = ExtResource("1_q60fs")
+color = Color(0.46614927, 0.7135701, 0.9947174, 1)
+width_left = 7
+width_top = 7
+width_right = 7
+width_bottom = 7
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_omrgh"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_nqcc7")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_apkv3")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[node name="lobby" type="Control" unique_id=324518503]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_nqcc7")
+
+[node name="background" type="Panel" parent="." unique_id=207862862]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_apkv3")
+
+[node name="MenuPanel" type="VBoxContainer" parent="." unique_id=1448021099]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -223.5
+offset_top = -292.5
+offset_right = 223.5
+offset_bottom = 292.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 35
+
+[node name="NameEdit" type="LineEdit" parent="MenuPanel" unique_id=1151031858]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+placeholder_text = "ENTER YOUR NAME"
+alignment = 1
+
+[node name="HostButton" type="Button" parent="MenuPanel" unique_id=718645483]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_07nfq")
+text = "HOST GAME"
+
+[node name="JoinButton" type="Button" parent="MenuPanel" unique_id=2123450988]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_oipnb")
+theme_override_styles/hover = SubResource("StyleBox_yad6j")
+text = "JOIN GAME"
+
+[node name="SettingsButton" type="Button" parent="MenuPanel" unique_id=1091711067]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_oipnb")
+theme_override_styles/hover = SubResource("StyleBox_yad6j")
+text = "SETTINGS"
+
+[node name="LoadoutButton" type="Button" parent="MenuPanel" unique_id=2013771355]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "LOADOUT"
+
+[node name="JoinPanel" type="Panel" parent="." unique_id=2114300154]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -524.5
+offset_top = -292.5
+offset_right = 524.5
+offset_bottom = 292.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_xrv66")
+
+[node name="ServerList" type="ItemList" parent="JoinPanel" unique_id=1985457721]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.048
+anchor_top = 0.086
+anchor_right = 0.048
+anchor_bottom = 0.086
+offset_left = 0.14799881
+offset_top = 0.18999863
+offset_right = 474.148
+offset_bottom = 478.19
+grow_vertical = 2
+size_flags_horizontal = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 30
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="RefreshButton" type="Button" parent="JoinPanel" unique_id=1449618402]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57100004
+anchor_top = 0.323
+anchor_right = 0.57100004
+anchor_bottom = 0.323
+offset_left = 0.52093506
+offset_top = -0.33000183
+offset_right = 352.52094
+offset_bottom = 68.92
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "REFRESH"
+
+[node name="ManualIP" type="LineEdit" parent="JoinPanel" unique_id=1363477795]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57100004
+anchor_top = 0.56
+anchor_right = 0.57100004
+anchor_bottom = 0.56
+offset_left = 0.52093506
+offset_top = -0.4750061
+offset_right = 352.52094
+offset_bottom = 68.774994
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+placeholder_text = "OR TYPE IP"
+alignment = 1
+
+[node name="ConnectButton" type="Button" parent="JoinPanel" unique_id=1187323665]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57100004
+anchor_top = 0.086
+anchor_right = 0.57100004
+anchor_bottom = 0.086
+offset_left = 0.52093506
+offset_top = 0.18999863
+offset_right = 352.52094
+offset_bottom = 69.44
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "CONNECT"
+
+[node name="BackButton" type="Button" parent="JoinPanel" unique_id=1067820199]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57100004
+anchor_top = 0.77900004
+anchor_right = 0.57100004
+anchor_bottom = 0.77900004
+offset_left = 0.52093506
+offset_top = 0.78497314
+offset_right = 352.52094
+offset_bottom = 70.03497
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "BACK"
+
+[node name="RoomPanel" type="Panel" parent="." unique_id=1595434122]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -524.5
+offset_top = -292.5
+offset_right = 524.5
+offset_bottom = 292.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_xrv66")
+
+[node name="YourIPLabel" type="Label" parent="RoomPanel" unique_id=1679433905]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -88.0
+offset_right = 353.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBox_pc087")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerList" type="ItemList" parent="RoomPanel" unique_id=1474264281]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.048
+anchor_top = 0.086
+anchor_right = 0.048
+anchor_bottom = 0.086
+offset_left = 0.147995
+offset_top = 0.18999863
+offset_right = 482.148
+offset_bottom = 406.19
+theme_override_font_sizes/font_size = 30
+theme_override_styles/panel = SubResource("StyleBox_omrgh")
+
+[node name="StartButton" type="Button" parent="RoomPanel" unique_id=849296447]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57100004
+anchor_top = 0.086
+anchor_right = 0.57100004
+anchor_bottom = 0.086
+offset_left = 0.52093506
+offset_top = -0.31000137
+offset_right = 352.52094
+offset_bottom = 68.94
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "START"
+
+[node name="LeaveButton" type="Button" parent="RoomPanel" unique_id=1790523849]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57100004
+anchor_top = 0.6779487
+anchor_right = 0.57100004
+anchor_bottom = 0.6779487
+offset_left = 0.52093506
+offset_top = 3.399994
+offset_right = 352.52094
+offset_bottom = 72.649994
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "LEAVE"
+metadata/_edit_use_anchors_ = true
+
+[node name="LoadoutButton" type="Button" parent="RoomPanel" unique_id=1022788045]
+layout_mode = 0
+offset_left = 600.5
+offset_top = 224.5
+offset_right = 952.5
+offset_bottom = 293.75
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_ncsg4")
+text = "LOADOUT"
+
+[node name="StatusLabel" type="Label" parent="." unique_id=1688515868]
+layout_mode = 0
+offset_right = 251.0
+offset_bottom = 228.0
+
+[node name="LoadingOverlay" parent="." unique_id=2049244250 instance=ExtResource("4_nqcc7")]
+visible = false
+layout_mode = 1
+
+[node name="Label" type="Label" parent="." unique_id=2029826765]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -256.0
+offset_right = 251.0
+grow_vertical = 0

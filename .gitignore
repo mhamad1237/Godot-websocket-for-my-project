@@ -1,0 +1,8 @@
+.godot/
+*.apk
+*.aab
+*.idsig
+export_presets.cfg
+key store/
+*.jks
+models/Pro Rifle Pack/Ch35_nonPBR.fbx

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cwa5a2w1pmlp3"]
+
+[ext_resource type="PackedScene" uid="uid://cj3skxaj2udw1" path="res://models/1.5x scope/1.5x scope.glb" id="1_haudl"]
+
+[node name="2x_scope_tp" type="Node3D" unique_id=1664707981]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 0, 0, 0)
+
+[node name="Sketchfab_Scene" parent="." unique_id=1803969918 instance=ExtResource("1_haudl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04896465, 0)

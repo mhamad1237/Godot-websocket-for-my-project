@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://dxiv0yq0h0w12"]
+
+[ext_resource type="Script" uid="uid://b5j7lmuv6sxnm" path="res://scripts/SettingsMenu.gd" id="1_6wm04"]
+[ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="1_r6d6q"]
+[ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="2_6wm04"]
+
+[sub_resource type="Resource" id="Resource_f4mfi"]
+script = ExtResource("1_r6d6q")
+color = Color(0.46614927, 0.7135701, 0.9947174, 1)
+width_left = 10
+width_top = 10
+width_right = 10
+width_bottom = 10
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_es4n0"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+script = ExtResource("2_6wm04")
+color = Color(0.0015846869, 0, 0.10422378, 1)
+borders = Array[ExtResource("1_r6d6q")]([SubResource("Resource_f4mfi")])
+
+[sub_resource type="Resource" id="Resource_gyc6d"]
+script = ExtResource("1_r6d6q")
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_r6d6q"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_6wm04")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_r6d6q")]([SubResource("Resource_gyc6d")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_omrgh"]
+script = ExtResource("1_r6d6q")
+color = Color(0.13333334, 0.56078434, 0.972549, 1)
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_6wm04"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_6wm04")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_r6d6q")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_f4mfi"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("2_6wm04")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("1_r6d6q")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[node name="settings" type="Control" unique_id=2035703649]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_6wm04")
+
+[node name="Panel" type="Panel" parent="." unique_id=1036508889]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_es4n0")
+
+[node name="Scroll" type="ScrollContainer" parent="Panel" unique_id=692120321]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1262.0
+offset_bottom = 594.0
+mouse_filter = 2
+theme_override_constants/scrollbar_h_separation = 20
+theme_override_constants/scrollbar_v_separation = 20
+
+[node name="List" type="VBoxContainer" parent="Panel/Scroll" unique_id=1174712596]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ResetButton" type="Button" parent="Panel" unique_id=1908574488]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.777
+anchor_top = 0.83300006
+anchor_right = 0.777
+anchor_bottom = 0.83300006
+offset_left = -0.55999756
+offset_top = 0.2399292
+offset_right = 275.44
+offset_bottom = 107.23993
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBox_r6d6q")
+theme_override_styles/pressed = SubResource("StyleBox_6wm04")
+theme_override_styles/hover = SubResource("StyleBox_f4mfi")
+text = "RESET"
+
+[node name="BackButton" type="Button" parent="Panel" unique_id=1383854506]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.016062498
+anchor_top = 0.8330001
+anchor_right = 0.016062498
+anchor_bottom = 0.8330001
+offset_left = -0.55999756
+offset_top = 0.2399292
+offset_right = 275.44
+offset_bottom = 107.23993
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBox_r6d6q")
+theme_override_styles/pressed = SubResource("StyleBox_6wm04")
+theme_override_styles/hover = SubResource("StyleBox_f4mfi")
+text = "BACK"
+metadata/_edit_use_anchors_ = true

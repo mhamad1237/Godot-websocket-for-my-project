@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://lv4l0frtpxgt"]
+
+[ext_resource type="PackedScene" uid="uid://c4mhy0e1dp2i" path="res://models/maps/sandyards/sandyards_standoff_2.glb" id="1_843a7"]
+[ext_resource type="ArrayOccluder3D" uid="uid://jgumdswm3d7b" path="res://baking/sandyards.occ" id="2_vjas1"]
+[ext_resource type="Texture2D" uid="uid://dgthjrw7vjrx8" path="res://models/maps/sandyards/sandyards_standoff_2_1.png" id="3_dcyw7"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g7b7a"]
+size = Vector3(2.4760742, 0.4975586, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gyc6d"]
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("3_dcyw7")
+
+[sub_resource type="QuadMesh" id="QuadMesh_g7b7a"]
+material = SubResource("StandardMaterial3D_gyc6d")
+size = Vector2(2.4, 0.74)
+orientation = 1
+
+[node name="map" type="Node3D" unique_id=927697922]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, 0, 0)
+
+[node name="Sketchfab_Scene" parent="." unique_id=737826470 instance=ExtResource("1_843a7")]
+
+[node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=1901656598]
+visible = false
+occluder = ExtResource("2_vjas1")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=2118060991]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1875870828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.976534, -0.2512207, -4.998125)
+shape = SubResource("BoxShape3D_g7b7a")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1879838343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.956322, 0, -4.910927)
+mesh = SubResource("QuadMesh_g7b7a")
+
+[node name="spawn_point_1" type="Marker3D" parent="." unique_id=1209390258 groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.783405, 4.782662, -6.503331)
+
+[node name="spawn_point_2" type="Marker3D" parent="." unique_id=1903939283 groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.93661, 3.7305493, -9.525799)

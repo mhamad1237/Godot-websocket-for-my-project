@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://de3ri00bfryps"]
+
+[ext_resource type="PackedScene" uid="uid://ckwm8ut8ghmmi" path="res://models/makarov pistol/tp/makarov_pistol_tp.glb" id="1_i1tt1"]
+
+[node name="weapon" type="Node3D" unique_id=616960425]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0)
+
+[node name="model" parent="." unique_id=1070286544 instance=ExtResource("1_i1tt1")]
+
+[node name="muzzle" type="Node3D" parent="." unique_id=1169495977]
+transform = Transform3D(-1.7484555e-10, 0, 0.004, 0, 0.004, 0, -0.004, 0, -1.7484555e-10, 0, 0.002855409, 0.010475961)
+
+[node name="handle" type="Node3D" parent="." unique_id=833897375]
+transform = Transform3D(0.99859923, 0.047852267, 0.022576753, -0.049423333, 0.99595004, 0.07510542, -0.018891353, -0.07611603, 0.99691993, 0.0012160663, 0.00072040036, 0.0026443321)
+
+[editable path="model"]

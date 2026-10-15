@@ -1,0 +1,29 @@
+[remap]
+
+importer="2d_array_texture"
+type="CompressedTexture2DArray"
+uid="uid://cpc3vyi5ox7w"
+path.astc="res://.godot/imported/main.exr-852e4eeee9663e7f9263c3b066a2734c.astc.ctexarray"
+metadata={
+"imported_formats": ["etc2_astc"],
+"vram_texture": true
+}
+
+[deps]
+
+source_file="res://baking/main.exr"
+dest_files=["res://.godot/imported/main.exr-852e4eeee9663e7f9263c3b066a2734c.astc.ctexarray"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
+compress/hdr_compression=1
+compress/channel_pack=1
+mipmaps/generate=false
+mipmaps/limit=-1
+slices/horizontal=1
+slices/vertical=1

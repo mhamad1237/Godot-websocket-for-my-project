@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://bjl7mq13gtdsu"]
+
+[ext_resource type="PackedScene" uid="uid://bu0qoi4qx8uj0" path="res://models/ak47/akm_assault_rifle_-_animated.glb" id="1_sj0nw"]
+[ext_resource type="Script" uid="uid://clqcxaokcphpq" path="res://scripts/ak_47.gd" id="1_t60o2"]
+[ext_resource type="Script" uid="uid://bdpp2tfxfnt44" path="res://scripts/animation_player_ak47.gd" id="2_8s1la"]
+[ext_resource type="Animation" uid="uid://dsi35r1tx2i32" path="res://models/ak47/reload.res" id="2_x8jse"]
+[ext_resource type="Animation" uid="uid://dxp5bwisqe2wl" path="res://models/ak47/equip.res" id="3_0bji5"]
+[ext_resource type="Animation" uid="uid://ci1umblqwy74j" path="res://models/ak47/ak_animations.res" id="3_mpgmn"]
+[ext_resource type="AudioStream" uid="uid://rhiu4hyqcy8e" path="res://sounds/ak bolt.mp3" id="3_q6xt7"]
+[ext_resource type="AudioStream" uid="uid://dai8d5ts2c8wu" path="res://sounds/ak reload(1).mp3" id="4_x8jse"]
+[ext_resource type="AudioStream" uid="uid://drgo5ukasgc3p" path="res://sounds/ak reload(2).mp3" id="5_0gusv"]
+[ext_resource type="AudioStream" uid="uid://dmsch6cwqklp7" path="res://sounds/ak equip.mp3" id="8_hpwu8"]
+[ext_resource type="AudioStream" uid="uid://c38ty3q7by7we" path="res://sounds/ak shot.mp3" id="8_t60o2"]
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0gusv"]
+_data = {
+&"ak_animations": ExtResource("3_mpgmn"),
+&"equip": ExtResource("3_0bji5"),
+&"reload": ExtResource("2_x8jse")
+}
+
+[node name="weapon" type="Node3D" unique_id=1673703102]
+script = ExtResource("1_t60o2")
+
+[node name="model" parent="." unique_id=678145553 instance=ExtResource("1_sj0nw")]
+
+[node name="akm_base" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(678145553, 552738052) index="2" unique_id=817170983]
+transform = Transform3D(-0.9999998, -8.742275e-08, -3.8213697e-15, 0, -4.3711374e-08, 0.9999997, -8.742276e-08, 0.9999997, 4.3711374e-08, 0, 0.11135365, 4.9806566)
+
+[node name="RemoteTransform3D" type="RemoteTransform3D" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_base_M_AKM_body_0" parent_id_path=PackedInt32Array(678145553, 2053836550) index="0" unique_id=185583248]
+transform = Transform3D(-1, -5.684342e-14, -8.742277e-08, -3.821371e-15, 0.9999999, 1.4210855e-14, 8.742278e-08, 3.5527137e-15, -0.9999999, -0.43186757, 13.208925, 12.955065)
+remote_path = NodePath("../../../../../../../../ScopeMount")
+update_scale = false
+
+[node name="akm_magazine" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="2" unique_id=959090787]
+transform = Transform3D(1, -2.9154452e-09, 1.6639574e-16, 2.9154452e-09, 1, -1.457731e-09, -1.6214581e-16, 1.457731e-09, 1, 9.329423e-08, 0.9827982, 16.561815)
+
+[node name="akm_trigger" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="3" unique_id=1658051253]
+transform = Transform3D(1, 0, -4.2377607e-35, 0, 1, -1.4210855e-14, 4.2377607e-35, 1.4210855e-14, 1, 5.293956e-23, 4.790164, 5.5018334)
+
+[node name="akm_release" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="4" unique_id=527177802]
+transform = Transform3D(1, -4.2166888e-27, -1.5612512e-18, 1.5994252e-27, 1, -1.6763885e-09, 1.5612512e-18, 1.6763885e-09, 1, 0, 1.7743053, 11.586392)
+
+[node name="akm_ejectionport" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="5" unique_id=1500090724]
+transform = Transform3D(1, -4.5e-44, -3.1554436e-30, 0, 1, -1.4210855e-14, 3.1554436e-30, 1.4210855e-14, 1, -8.7892665e-17, 9.246904, 21.88217)
+
+[node name="AnimationPlayer" parent="model" index="1" unique_id=1899898470]
+libraries/ = SubResource("AnimationLibrary_0gusv")
+script = ExtResource("2_8s1la")
+bolt_sound = ExtResource("3_q6xt7")
+equip_sound = ExtResource("8_hpwu8")
+reload1 = ExtResource("4_x8jse")
+reload2 = ExtResource("5_0gusv")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="model/AnimationPlayer" index="0" unique_id=724470599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1522694, 0.54278094)
+stream = ExtResource("3_q6xt7")
+volume_db = 7.5
+
+[node name="shoot_sound" type="AudioStreamPlayer3D" parent="." unique_id=65614066]
+stream = ExtResource("8_t60o2")
+volume_db = -2.5
+
+[node name="muzzle" type="Marker3D" parent="." unique_id=550168970]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.127, -0.756)
+
+[node name="ScopeMount" type="Node3D" parent="." unique_id=534826225]
+transform = Transform3D(0.9999441, -8.74171e-08, 8.741846e-08, 8.741789e-08, 0.9999358, -4.3709196e-08, -8.741788e-08, 4.3708575e-08, 0.9999504, 0.0043186634, 0.18189578, -0.13066414)
+
+[editable path="model"]

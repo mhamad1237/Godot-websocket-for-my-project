@@ -1,0 +1,72 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://c4mhy0e1dp2i"
+path="res://.godot/imported/sandyards_standoff_2.glb-d8812087a0081aa2e826871ecab30218.scn"
+
+[deps]
+
+source_file="res://models/maps/sandyards/sandyards_standoff_2.glb"
+dest_files=["res://.godot/imported/sandyards_standoff_2.glb-d8812087a0081aa2e826871ecab30218.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+mesh_library/use_node_names_as_mesh_names=false
+array_mesh/deduplicate_surfaces=true
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=2
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"nodes": {
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/1_4/1_Material #19859_0_0/Object_9": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/1_4/1_Sandstone_d2_0_2/Object_13": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/1_4/1_wall1_0_3/Object_15": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/Sandyards_001_11/Sandyards_Sandstone_D_0_7/Object_20": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/Sandyards_001_11/Sandyards_Sandstone_d2_0_6/Object_18": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/Sandyards_001_11/Sandyards_wall1_0_8/Object_22": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/Sandyards_001_11/Sandyards_wall3_0_9/Object_24": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/Sketchfab_model_15/Sandyards_fbx_14/RootNode_13/Sandyards_12/Sandyards_001_11/Sandyards_wall5_0_10/Object_26": {
+"generate/physics": true
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1
+gltf/texture_map_mode=1

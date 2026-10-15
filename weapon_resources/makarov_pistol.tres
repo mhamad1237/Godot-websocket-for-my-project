@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://cv3vklmbiy2ib"]
+
+[ext_resource type="Script" uid="uid://b3ttjw2qi1jnr" path="res://scripts/WeaponData.gd" id="1_ykcad"]
+[ext_resource type="PackedScene" uid="uid://dflob8hn1mkjf" path="res://scenes/makarov_pistol.tscn" id="2_n7f02"]
+
+[resource]
+script = ExtResource("1_ykcad")
+weapon_scene = ExtResource("2_n7f02")
+hold_position = Vector3(0.08921905, -0.17381763, -0.086830646)
+weapon_name = "makarov_pistol"
+type = "pistol"
+fire_rate = 0.3
+damage = 35
+magazine_size = 8
+is_semi_auto = true
+bob_amount = 0.005
+sprint_bob_amount = 0.013
+sprint_bob_speed = 10.0
+bob_rotation = Vector3(-12.2, 0, 15.7)
+clip_ray_length = -0.58
+metadata/_custom_type_script = "uid://b3ttjw2qi1jnr"

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://c38ty3q7by7we"
+path="res://.godot/imported/ak shot.mp3-68f1faa615807dc81b1e04d4b69e9039.mp3str"
+
+[deps]
+
+source_file="res://sounds/ak shot.mp3"
+dest_files=["res://.godot/imported/ak shot.mp3-68f1faa615807dc81b1e04d4b69e9039.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

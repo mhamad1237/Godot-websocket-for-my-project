@@ -1,0 +1,84 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://cj3skxaj2udw1"
+path="res://.godot/imported/1.5x scope.glb-2bf21e69ab9b10bc2c4aa4d33dbb9d32.scn"
+
+[deps]
+
+source_file="res://models/1.5x scope/1.5x scope.glb"
+dest_files=["res://.godot/imported/1.5x scope.glb-2bf21e69ab9b10bc2c4aa4d33dbb9d32.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+mesh_library/use_node_names_as_mesh_names=false
+array_mesh/deduplicate_surfaces=true
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"nodes": {
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wPlane_002/wPlane_002__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_010/wRing_010__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_011/wRing_011__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_013/wRing_013__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_014/wRing_014__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_015/wRing_015__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_016/wRing_016__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wRing_017/wRing_017__0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wSphere_002": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wSphere_002/wSphere_002_Scope_0": {
+"mesh_instance/cast_shadow": 0
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wSphere_003": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/ec659cf87b684da29dc56ad8caeb0090_fbx/RootNode/wSphere_003/wSphere_003__0": {
+"mesh_instance/cast_shadow": 0
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1
+gltf/texture_map_mode=1

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TpWeaponData" format=3 uid="uid://3gakug4fykk4"]
+
+[ext_resource type="PackedScene" uid="uid://cwa5a2w1pmlp3" path="res://scenes/2x_scope_tp.tscn" id="1_3neol"]
+[ext_resource type="Script" uid="uid://cqhwp1jb1e4pg" path="res://scripts/tp_weapon_data.gd" id="1_rtvw7"]
+[ext_resource type="PackedScene" uid="uid://cqiq1kwraq7fg" path="res://scenes/ak_47_tp.tscn" id="2_lev6h"]
+
+[resource]
+script = ExtResource("1_rtvw7")
+weapon_scene = ExtResource("2_lev6h")
+hold_position = Vector3(-0.006045699, 0.04742506, 0.005008355)
+hold_rotation_degrees = Vector3(77.5, 66.2, -19.6)
+available_scopes = Array[PackedScene]([ExtResource("1_3neol")])
+metadata/_custom_type_script = "uid://cqhwp1jb1e4pg"

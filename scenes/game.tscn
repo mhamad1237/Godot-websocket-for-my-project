@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://c8sgximtgs7g3"]
+
+[ext_resource type="Script" uid="uid://bkcgkyxna7khr" path="res://scripts/game.gd" id="1_lnu2h"]
+[ext_resource type="PackedScene" uid="uid://dyk5f6hjd3nxy" path="res://scenes/touch_controls.tscn" id="3_tbgi4"]
+[ext_resource type="Environment" uid="uid://bgpuyk1smvccw" path="res://new_environment.tres" id="4_lbhrr"]
+[ext_resource type="PackedScene" uid="uid://lv4l0frtpxgt" path="res://scenes/sandyards.tscn" id="4_tbgi4"]
+[ext_resource type="Script" uid="uid://bjpuysn02ot2l" path="res://scripts/websocket_test.gd" id="5_iywne"]
+
+[node name="game" type="Node3D" unique_id=194710337 node_paths=PackedStringArray("controls_root")]
+script = ExtResource("1_lnu2h")
+controls_root = NodePath("touch_controls/gameplay")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=158576393]
+transform = Transform3D(1, 0, 0, 0, 0.7071067, 0.7071067, 0, -0.7071067, 0.7071067, 0, 0, -0.66066325)
+light_color = Color(1, 0.8594817, 0.6229372, 1)
+light_energy = 0.6
+shadow_enabled = true
+directional_shadow_mode = 0
+directional_shadow_max_distance = 40.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=646461404]
+environment = ExtResource("4_lbhrr")
+
+[node name="touch_controls" parent="." unique_id=2048230818 instance=ExtResource("3_tbgi4")]
+
+[node name="map" parent="." unique_id=927697922 instance=ExtResource("4_tbgi4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -11.9224825, 23.421968)
+
+[node name="Players" type="Node3D" parent="." unique_id=1172333140]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=17942443]
+spawn_path = NodePath("../Players")
+
+[node name="Node" type="Node" parent="." unique_id=187857439]
+script = ExtResource("5_iywne")
+
+[editable path="touch_controls"]

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dmsch6cwqklp7"
+path="res://.godot/imported/ak equip.mp3-b68e3e981f0484dcc3eff19d2f451657.mp3str"
+
+[deps]
+
+source_file="res://sounds/ak equip.mp3"
+dest_files=["res://.godot/imported/ak equip.mp3-b68e3e981f0484dcc3eff19d2f451657.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
