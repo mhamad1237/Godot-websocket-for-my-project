@@ -68,6 +68,3 @@ func _process(delta: float) -> void:
 		tilt,
 		clampf(crouch_tilt_speed * delta, 0.0, 1.0)
 	)
-
-func play_muzzle_flash() -> void:
-	muzzle_flash.play()

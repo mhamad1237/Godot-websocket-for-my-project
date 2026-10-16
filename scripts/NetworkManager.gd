@@ -7,6 +7,7 @@
 extends Node
 signal preload_progress(progress: float)
 signal preload_finished
+var offline := false
 
 signal connection_succeeded
 signal connection_failed
@@ -17,6 +18,7 @@ signal roster_changed
 signal game_started
 signal preload_failed
 signal show_loading_overlay
+signal debug_status(text: String)   # lobby shows these in its status label
 
 # ---- Edit these for your project ----
 const SERVER_URL := "wss://zj2a51j4thjj-production-tzymyhgd.europe-west1.suga.run"   # no port, Suga uses 443
@@ -49,6 +51,27 @@ var is_preloading := false
 var preload_done := false
 var loading_overlay: Control = null   # set by the lobby
 var _loading_layer: CanvasLayer = null
+
+
+var _last_conn_status := -1
+
+
+## Clients: shown on screen via debug_status. Server: goes to the Suga logs.
+func _dbg(text: String) -> void:
+	if dedicated:
+		print("[NET] ", text)
+	else:
+		debug_status.emit(text)
+
+
+func _process(_delta: float) -> void:
+	var peer := multiplayer.multiplayer_peer
+	if peer == null or dedicated:
+		return
+	var st := peer.get_connection_status()
+	if st != _last_conn_status:
+		_last_conn_status = st
+		_dbg("Status: " + ["DISCONNECTED", "CONNECTING", "CONNECTED"][st])
 
 
 func _ready() -> void:
@@ -114,17 +137,22 @@ func start_dedicated_server() -> Error:
 func join_online(player_name: String, url: String = SERVER_URL) -> Error:
 	disconnect_game()
 	local_name = _clean_name(player_name)
+	_last_conn_status = -1
+	_dbg("Connecting to %s as %s" % [url, local_name])
 	var peer := WebSocketMultiplayerPeer.new()
 	var err := peer.create_client(url)
+	_dbg("create_client: " + error_string(err))
 	if err != OK:
 		push_warning("NetworkManager: create_client failed (%s)" % error_string(err))
 		return err
 	multiplayer.multiplayer_peer = peer
+	_dbg("Searching for server...")
 	return OK
 
 
 ## Closes the connection and resets all state. Safe to call anytime.
 func disconnect_game() -> void:
+	offline = false
 	Global.clear_local_refs()
 	if multiplayer.multiplayer_peer is WebSocketMultiplayerPeer:
 		multiplayer.multiplayer_peer.close()
@@ -137,7 +165,17 @@ func disconnect_game() -> void:
 	_spawned = false
 	in_game = false
 	_clear_overlay()
-
+func start_singleplayer(player_name: String) -> void:
+	disconnect_game()
+	offline = true
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()   # new
+	local_name = _clean_name(player_name)
+	players = {1: {"name": local_name}}
+	_loaded_peers = {1: true}
+	_spawned = false
+	_server_world_ready = false
+	in_game = true
+	proceed_to_game()
 
 ## Leave a running match and go back to the lobby.
 func leave_game() -> void:
@@ -162,7 +200,7 @@ func register_world(players_root: Node, spawner: MultiplayerSpawner) -> void:
 	_players_root = players_root
 	_spawner = spawner
 	_spawner.spawn_function = _spawn_player_func
-	if multiplayer.is_server():
+	if offline or multiplayer.is_server():
 		_server_world_ready = true
 		_try_spawn()
 	else:
@@ -180,6 +218,7 @@ func get_player_node(id: int) -> Node:
 # Connection callbacks
 # ============================================================
 func _on_peer_connected(id: int) -> void:
+	_dbg("peer connected: %d" % id)
 	if not multiplayer.is_server():
 		return
 	# No join-in-progress in this version: reject anyone who connects mid-match.
@@ -205,16 +244,19 @@ func _on_peer_disconnected(id: int) -> void:
 
 
 func _on_connected_to_server() -> void:
+	_dbg("Connected! id=%d, registering as %s" % [multiplayer.get_unique_id(), local_name])
 	_register_player.rpc_id(1, local_name, GAME_VERSION)
 	connection_succeeded.emit()
 
 
 func _on_connection_failed() -> void:
+	_dbg("Connection FAILED: server not found or refused")
 	disconnect_game()
 	connection_failed.emit()
 
 
 func _on_server_disconnected() -> void:
+	_dbg("Server disconnected")
 	var was_in_game := in_game
 	disconnect_game()
 	server_closed.emit()
@@ -241,7 +283,9 @@ func _register_player(pname: String, version: String) -> void:
 	if not multiplayer.is_server():
 		return
 	var id := multiplayer.get_remote_sender_id()
+	_dbg("register request from %d name=%s version=%s" % [id, pname, version])
 	if version != GAME_VERSION or players.size() >= MAX_PLAYERS or in_game:
+		_dbg("rejected %d (version/full/in_game)" % id)
 		multiplayer.multiplayer_peer.disconnect_peer(id)
 		return
 	players[id] = {"name": _clean_name(pname)}
@@ -252,6 +296,7 @@ func _register_player(pname: String, version: String) -> void:
 @rpc("authority", "call_local", "reliable")
 func _sync_roster(roster: Dictionary) -> void:
 	players = roster
+	_dbg("Roster: %d player(s)" % players.size())
 	roster_changed.emit()
 
 

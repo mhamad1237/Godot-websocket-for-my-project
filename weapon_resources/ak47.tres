@@ -11,6 +11,7 @@ hold_position = Vector3(0.094, -0.247, -0.17)
 weapon_name = "ak47"
 type = "rifle"
 damage = 15
+accuracy_multiplier = 1.25
 bob_amount = 0.005
 bob_offset = Vector3(0.1, -0.019, -0.065)
 bob_rotation = Vector3(0, 90, 0)

@@ -20,6 +20,7 @@ const NO_SCOPE_NAME := "no_scope"
 @export var fire_rate: float = 0.1
 @export var damage: int = 10
 @export var magazine_size: int = 30
+@export var accuracy_multiplier : float = 1
 @export var is_shotgun: bool = false
 @export var pellet_count: int = 8  # only used if is_shotgun
 @export var is_semi_auto: bool = false

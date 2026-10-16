@@ -2,17 +2,24 @@
 
 [ext_resource type="Script" uid="uid://coaslsecvhw0h" path="res://scripts/bullet_tracer.gd" id="1_dk6yj"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m63kh"]
-albedo_color = Color(1, 0.5411765, 0.14117648, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ai1qo"]
+blend_mode = 1
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.8117647, 0.4, 0, 1)
 emission_enabled = true
-emission = Color(1, 0.5411765, 0.14117648, 1)
-emission_energy_multiplier = 3.2
+emission = Color(0.8117647, 0.4, 0, 1)
+emission_energy_multiplier = 5.95
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_veaow"]
-material = SubResource("StandardMaterial3D_m63kh")
+material = SubResource("StandardMaterial3D_ai1qo")
 top_radius = 0.015
 bottom_radius = 0.015
 height = 1.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_dk6yj"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [node name="BulletTracer" type="Node3D" unique_id=1614831313]
 script = ExtResource("1_dk6yj")
@@ -20,3 +27,6 @@ script = ExtResource("1_dk6yj")
 [node name="Line" type="MeshInstance3D" parent="." unique_id=2147286000]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
 mesh = SubResource("CylinderMesh_veaow")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=513021712]
+replication_config = SubResource("SceneReplicationConfig_dk6yj")

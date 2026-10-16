@@ -4,11 +4,24 @@ extends CharacterBody3D
 const WALK_SPEED := 3.0
 const SPRINT_SPEED := 6.0
 const CROUCH_SPEED := 1.5
-const ADS_SPEED:= 1.0
-var _prev_pos := Vector3.ZERO
+var _was_moving : bool = false
+var _idle_frames : int = 0
+var _has_triggered_start_step : bool = false
 
+var fade_speed : float = 40.0  # Speed of the volume fade per second
+
+const ADS_SPEED:= 1.0
+@onready var respawn_label: Label = $RespawnLabel
 const ACCELERATION := 20.0
-@onready var gun_camera : Camera3D = $WeaponViewportContainer/SubViewport/WeaponCamera
+const FOOTSTEP_DIR := "res://sounds/footsteps/"
+const FOOTSTEP_STRIDE_WALK := 1.4     # metres between steps
+const FOOTSTEP_STRIDE_SPRINT := 2.2
+var _footsteps: Array[AudioStream] = []
+var _step_players: Array[AudioStreamPlayer3D] = []
+var _step_toggle := 0
+var _step_dist := 0.0
+var _last_step_idx := -1
+var _prev_step_pos := Vector3.ZERO
 var desired_velocity := Vector3.ZERO
 @export var landing_smooth_speed := 4.0
 var _r_move := Vector2.ZERO
@@ -101,25 +114,44 @@ var active_recoil_decay_speed: float = 6.0
 var sync_falling := false
 
 var _state_sync_timer := 0.0
-const STATE_SYNC_INTERVAL := 0.05 # 20 updates per second
-
+const STATE_SYNC_INTERVAL := 0.025
+@onready var loadout_button: Button = $RespawnContainer/LoadoutButton
+var _loadout_layer: CanvasLayer = null
+@onready var respawn_container: Control = $RespawnContainer
+@onready var respawn_button: Button = $RespawnContainer/RespawnButton
+var _death_time_ms := 0
 var current_collision_mode := ""
 func _ready() -> void:
+	if not NetworkManager.dedicated:   # the headless server needs no audio
+		_load_footsteps()
+		for n in 2:   # two players so a step's tail isn't cut off by the next one
+			var p := AudioStreamPlayer3D.new()
+			p.max_distance = 25.0
+			p.unit_size = 4.0
+			add_child(p)
+			_step_players.append(p)
+		_prev_step_pos = global_position
 	_apply_stance_to_tree()
+	respawn_container.hide()
+	respawn_label.hide()   # hidden on every peer, including remote copies
 	floor_snap_length = MAX_STEP_HEIGHT
 	if is_multiplayer_authority():
+		if NetworkManager.offline:
+			_add_debug_kill_button()
+		loadout_button.pressed.connect(_on_loadout_pressed)
+		respawn_button.pressed.connect(_on_respawn_pressed)
 		Global.player = self
 		camera.current = true
 		head_bob_base_position = camera_pivot.position
 		NetworkManager.notify_local_player_ready()
-		tps_rig.hide()
+		#tps_rig.hide()
 		health = max_health
 		get_tree().call_group("hud", "bind_player", self)
 		call_deferred("_init_walking_animation")
 
 	else:
 		camera.current = false
-		weapon_holder.hide()
+		weapon_holder.bob_pivot.hide()
 		set_physics_process(false)
 		call_deferred("_init_walking_animation")
 	set_collision("standing")
@@ -136,11 +168,32 @@ func _apply_stance_to_tree() -> void:
 		"parameters/WeaponTransition/transition_request",
 		"pistol" if stance == Stance.PISTOL else "rifle"
 	)
+func _add_debug_kill_button() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 90
+	add_child(layer)
+	var b := Button.new()
+	b.text = "KILL ME"
+	b.position = Vector2(20, 120)
+	b.custom_minimum_size = Vector2(160, 70)
+	b.pressed.connect(func() -> void:
+		if not is_dead:
+			_server_apply_damage(MAX_DAMAGE_PER_HIT, 0))
+	layer.add_child(b)
 func _process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		_remote_anim(delta)
 		return
+	_update_footsteps()
 
+	if is_moving:
+		# Mute them completely when moving
+		$Breathing.volume_db = move_toward($Breathing.volume_db, -50, fade_speed * delta)
+		$Wind.volume_db = move_toward($Wind.volume_db, -80, fade_speed * delta)
+	else:
+		# Very faint, whisper-quiet background levels when idle
+		$Breathing.volume_db = move_toward($Breathing.volume_db, -45.0, fade_speed * delta)
+		$Wind.volume_db = move_toward($Wind.volume_db, -40.0, fade_speed * delta)
 	# Send this player's animation state to the other peers.
 	_state_sync_timer += delta
 
@@ -857,10 +910,10 @@ func _apply_health(new_health: float, attacker_id: int) -> void:
 		_die(attacker_id)
 func _die(attacker_id: int) -> void:
 	is_dead = true
+	_death_time_ms = Time.get_ticks_msec()
 	died.emit(attacker_id)
 	_play_death_sound()
 
-	# Disable every collision shape on every peer.
 	collision_standing.disabled = true
 	collision_crouching.disabled = true
 	collision_crouch_walking.disabled = true
@@ -870,47 +923,38 @@ func _die(attacker_id: int) -> void:
 	if is_multiplayer_authority():
 		set_physics_process(false)
 		weapon_holder.hide()
-
-		# Back to standing state now, so respawn doesn't start crouched
 		is_crouching = false
 		is_sprinting = false
 		current_crouch_mode = ""
-
-		# Physics is off, so these must be set by hand or remote copies keep the crouch pose
 		sync_crouching = false
 		sync_sprinting = false
 		sync_airborne = false
 		sync_move = Vector2.ZERO
 
 		var tw := create_tween()
-		tw.tween_property(
-			anim_tree,
-			"parameters/SpineHipLock/blend_amount",
-			0.0,
-			0.2
-		)
-
+		tw.tween_property(anim_tree, "parameters/SpineHipLock/blend_amount", 0.0, 0.2)
 		anim_tree.set("parameters/JumpBlend/blend_amount", 0.0)
-
-		var loco: AnimationNodeStateMachinePlayback = anim_tree.get(
-			"parameters/Locomotion/playback"
-		)
-
+		var loco := _loco_playback()
 		if loco:
 			loco.travel("walking")
-	if not is_multiplayer_authority():
+	else:
 		tps_rig.hide()
 
-	if multiplayer.is_server():
-		await get_tree().create_timer(RESPAWN_TIME).timeout
-
-		var points := get_tree().get_nodes_in_group("spawn_points")
-		var pos := Vector3.ZERO
-
-		if points.size() > 0:
-			pos = (points.pick_random() as Node3D).global_position
-
-		_respawn.rpc(pos)
+	# Owner sees a countdown, then gets the buttons
+	if is_multiplayer_authority():
+		var end_ms := _death_time_ms + int(RESPAWN_TIME * 1000.0)
+		respawn_label.show()
+		while is_dead and is_inside_tree():
+			var left := (end_ms - Time.get_ticks_msec()) / 1000.0
+			if left <= 0.0:
+				break
+			respawn_label.text = "Respawn in %d" % ceili(left)
+			await get_tree().process_frame
+		respawn_label.hide()
+		if not is_inside_tree() or not is_dead:
+			return
+		respawn_button.disabled = false
+		respawn_container.show()
 
 
 func _play_death_sound() -> void:
@@ -923,6 +967,39 @@ func _play_death_sound() -> void:
 	p.global_position = global_position
 	p.finished.connect(p.queue_free)
 	p.play()
+
+func _on_respawn_pressed() -> void:
+	if not is_dead:
+		return
+	respawn_button.disabled = true
+	if multiplayer.is_server():
+		_server_do_respawn()
+	else:
+		_request_respawn.rpc_id(1)
+		await get_tree().create_timer(2.0).timeout
+		if is_dead and is_inside_tree():
+			respawn_button.disabled = false   # no answer, allow another try
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_respawn() -> void:
+	if not multiplayer.is_server():
+		return
+	if multiplayer.get_remote_sender_id() != get_multiplayer_authority():
+		return   # only the owner can respawn their own player
+	_server_do_respawn()
+
+
+func _server_do_respawn() -> void:
+	if not is_dead:
+		return
+	if Time.get_ticks_msec() - _death_time_ms < int(RESPAWN_TIME * 1000.0) - 250:
+		return   # pressed too early
+	var points := get_tree().get_nodes_in_group("spawn_points")
+	var pos := Vector3.ZERO
+	if points.size() > 0:
+		pos = (points.pick_random() as Node3D).global_position
+	_respawn.rpc(pos)
 @rpc("any_peer", "call_local", "reliable")
 func _respawn(pos: Vector3) -> void:
 	var sender := multiplayer.get_remote_sender_id()
@@ -931,6 +1008,8 @@ func _respawn(pos: Vector3) -> void:
 		return
 
 	is_dead = false
+	respawn_container.hide()
+	respawn_label.hide()
 	health = max_health
 	global_position = pos
 	velocity = Vector3.ZERO
@@ -946,6 +1025,7 @@ func _respawn(pos: Vector3) -> void:
 	if is_multiplayer_authority():
 		set_physics_process(true)
 		weapon_holder.show()
+		weapon_holder.apply_loadout_on_respawn()   # new
 
 		snapped_to_stairs_last_frame = false
 
@@ -953,3 +1033,90 @@ func _respawn(pos: Vector3) -> void:
 
 		# Gravity applies right away.
 		enter_air()
+func _on_loadout_pressed() -> void:
+	if not is_dead or _loadout_layer != null:
+		return
+	_loadout_layer = CanvasLayer.new()
+	_loadout_layer.layer = 100   # above the touch controls
+	add_child(_loadout_layer)
+	var menu := (load("res://scenes/loadout_menu.tscn") as PackedScene).instantiate()
+	_loadout_layer.add_child(menu)
+	respawn_container.hide()
+	menu.closed.connect(_close_loadout_menu)
+
+
+func _close_loadout_menu() -> void:
+	if is_instance_valid(_loadout_layer):
+		_loadout_layer.queue_free()
+	_loadout_layer = null
+	if is_dead:
+		respawn_container.show()
+func _load_footsteps() -> void:
+	for f in DirAccess.get_files_at(FOOTSTEP_DIR):
+		# exported builds list "name.mp3.import" or ".remap", so strip those
+		var fname := f.trim_suffix(".import").trim_suffix(".remap")
+		if fname.get_extension() in ["mp3", "ogg", "wav"]:
+			var s := load(FOOTSTEP_DIR + fname) as AudioStream
+			if s and not _footsteps.has(s):
+				_footsteps.append(s)
+func _update_footsteps() -> void:
+	if _footsteps.is_empty():
+		return
+		
+	var pos := global_position
+	var moved := Vector2(pos.x - _prev_step_pos.x, pos.z - _prev_step_pos.z).length()
+	_prev_step_pos = pos
+	
+	# Skip: dead, airborne, or teleports
+	if is_dead or sync_airborne or moved > 1.0:
+		_idle_frames = 10
+		_has_triggered_start_step = false
+		return
+		
+	if sync_crouching:
+		_idle_frames = 10
+		_has_triggered_start_step = false
+		return   # crouch-walking is silent
+
+	# Check if player is standing still
+	if moved < 0.0005:
+		_idle_frames += 1
+		# Must be standing still for at least 5 frames before resetting the start trigger
+		if _idle_frames > 5:
+			_has_triggered_start_step = false
+		return
+
+	# We are actively moving, reset idle counter
+	_idle_frames = 0
+
+	# If we just started moving from a true stop, play instantly ONCE
+	if not _has_triggered_start_step:
+		_has_triggered_start_step = true
+		_step_dist = 0.0
+		_play_footstep()
+		return
+
+	# Normal distance-based stepping while walking/running
+	_step_dist += moved
+	var stride := FOOTSTEP_STRIDE_SPRINT if sync_sprinting else FOOTSTEP_STRIDE_WALK
+	if _step_dist >= stride:
+		_step_dist = 0.0
+		_play_footstep()
+
+func _play_footstep() -> void:
+	var i := randi() % _footsteps.size()
+	if _footsteps.size() > 1 and i == _last_step_idx:
+		i = (i + 1 + randi() % (_footsteps.size() - 1)) % _footsteps.size()
+	_last_step_idx = i
+	_step_toggle = 1 - _step_toggle
+	var p := _step_players[_step_toggle]
+	p.stream = _footsteps[i]
+	
+	# Determine pitch multiplier based on movement state
+	var pitch_mult := 0.9
+	if is_sprinting:
+		pitch_mult = 1.35  # Higher pitch for faster/harder steps
+
+	p.volume_db = -10
+	p.pitch_scale = randf_range(0.95, 1.05) * pitch_mult
+	p.play()

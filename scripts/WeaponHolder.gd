@@ -5,8 +5,11 @@ extends Node3D
 var crosshair: Control
 var last_holder_bob_offset: Vector3 = Vector3.ZERO
 var tp_rig : Node3D = null
-@export var debug_label: Label
+
 var wall_avoid_rotation: float = 0.0
+var _tracer_pool: Array[Node3D] = []
+const TRACER_POOL_SIZE := 10
+var _tracer_i := 0
 
 @export var debug_draw_rays: bool = true
 const MAX_HOLES := 30
@@ -66,6 +69,31 @@ var is_ads := false
 var was_ads := false
 const NO_SCOPE_NAME := "no_scope"
 
+# ============================================================
+# ACCURACY SYSTEM
+# ============================================================
+
+@export_group("Accuracy - Spread (Degrees)")
+
+@export var standing_spread: float = 0.15
+@export var crouch_spread: float = 0.05
+@export var walking_spread: float = 0.8
+@export var crouch_moving_spread: float = 0.45
+@export var sprinting_spread: float = 4.0
+@export var airborne_spread: float = 6.0
+
+@export_group("Accuracy - ADS")
+
+@export var ads_spread_multiplier: float = 0.35
+
+@export_group("Accuracy - Firing")
+
+@export var shot_bloom: float = 0.12
+@export var max_shot_bloom: float = 1.5
+@export var bloom_recovery_speed: float = 2.0
+
+var current_shot_bloom: float = 0.0
+
 signal weapon_fired
 
 func _ready() -> void:
@@ -82,7 +110,6 @@ func _ready() -> void:
 
 	await get_tree().process_frame
 	crosshair = Global.crosshair
-	muzzle = current_weapon.get_node("muzzle")
 	player = Global.player
 	tp_rig = player.get_node("ThirdPersonRig")
 	fire_timer = Timer.new()
@@ -90,46 +117,32 @@ func _ready() -> void:
 	add_child(fire_timer)
 	_init_bullet_holes()
 	_warm_up_bullet_holes()
-	warm_up_tracer()
-	
+	_warm_up_tracer()
+	_init_tracer_pool()
+func _warm_up_tracer() -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
 
-func warm_up_tracer() -> void:
+	if _tracer_pool.is_empty():
+		_init_tracer_pool()
+
+	var cam: Camera3D = player.camera
+	var from := cam.global_position - cam.global_transform.basis.z * 0.5
+	var to := from - cam.global_transform.basis.z * 2.0  # give it real direction/length
+
+	var tracer = _tracer_pool[0]
+	tracer.setup(from, to)
+
 	await get_tree().process_frame
 	await get_tree().process_frame
 
 
-	var cam := get_node_or_null("CameraPivot/Camera3D") as Camera3D
-	if not is_instance_valid(cam):
-		push_warning("Warm-up: Camera3D not found.")
-		return
-
-	var tracer := BULLET_TRACER.instantiate() as Node3D
-	if tracer == null:
-		push_warning("Warm-up: tracer root is not Node3D.")
-		return
-
-	add_child(tracer)
-
-	await get_tree().process_frame
-
-	if not is_instance_valid(tracer):
-		push_warning("Warm-up: tracer was freed during setup.")
-		return
-
-	tracer.global_transform = Transform3D(
-		cam.global_transform.basis,
-		cam.global_position - cam.global_transform.basis.z * 0.5
-	)
-	tracer.visible = true
-
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-	if is_instance_valid(tracer):
-		tracer.visible = false
-		tracer.queue_free()
-
-
+func _init_tracer_pool() -> void:
+	for i in TRACER_POOL_SIZE:
+		var t = BULLET_TRACER.instantiate()
+		t.visible = false
+		get_tree().root.add_child.call_deferred(t)
+		_tracer_pool.append(t)
 
 func _warm_up_bullet_holes() -> void:
 	# Wait until the deferred add_child calls have finished
@@ -175,7 +188,7 @@ func equip_weapon(weapon_data: WeaponData, scope_index := -1) -> void:
 
 	current_weapon.setup(weapon_data)
 	shoot_sound = current_weapon.get_node_or_null("shoot_sound")
-
+	muzzle = current_weapon.get_node_or_null("muzzle")
 	current_ammo = weapon_data.magazine_size
 	base_position = position
 
@@ -187,10 +200,30 @@ func equip_weapon(weapon_data: WeaponData, scope_index := -1) -> void:
 	current_weapon.scope_changed.connect(func(i: int) -> void: Global.player.sync_scope.rpc(i))
 	await get_tree().process_frame
 	await get_tree().process_frame
-
 	Global.player.sync_weapon.rpc(weapon_data.weapon_name, weapon_data.type)
 	Global.player.sync_scope.rpc(scope_index)
 	current_weapon.weapon_anim_player.play("equip")
+
+func apply_loadout_on_respawn() -> void:
+	is_firing = false
+	is_reloading = false   # a reload cut off by death never finishes
+	if is_ads:
+		var anim := _get_ads_anim()
+		if animation_player and animation_player.has_animation(anim):
+			animation_player.play(anim)
+			animation_player.seek(0.0, true)
+			animation_player.stop()
+		is_ads = false
+		if crosshair:
+			crosshair.show()
+
+	var changed := current_weapon == null \
+		or Loadout.weapon_data != current_weapon_data \
+		or Loadout.scope_index != current_weapon.current_scope_index
+	if changed:
+		equip_weapon(Loadout.weapon_data, Loadout.scope_index)
+	elif current_weapon_data:
+		current_ammo = current_weapon_data.magazine_size
 
 func _physics_process(_delta: float) -> void:
 	process_weapon_input()
@@ -253,14 +286,26 @@ func _on_reload_start() -> void:
 	current_ammo = current_weapon_data.magazine_size
 	is_reloading = false
 
-
 func _fire_shot() -> void:
-	if current_weapon.weapon_anim_player.is_playing():
+	if current_weapon.weapon_anim_player.is_playing() or wall_check_ray.is_colliding():
 		return
+
+	if player.is_sprinting:
+		Input.action_release("sprint")
+		await get_tree().create_timer(0.2).timeout
+
 	fire_timer.start(current_weapon_data.fire_rate)
 	current_ammo -= 1
+
+	# Increase inaccuracy when firing.
+	current_shot_bloom = minf(
+		current_shot_bloom + shot_bloom,
+		max_shot_bloom
+	)
+
 	weapon_fired.emit()
 	_on_fire()
+
 	if current_weapon_data.is_shotgun:
 		_do_shotgun_raycasts()
 	else:
@@ -278,7 +323,7 @@ func _on_fire() -> void:
 	current_weapon_data.cam_recoil_decay_speed
 )
 
-	tp_rig.play_muzzle_flash()
+
 
 
 func _get_aim_transform() -> Transform3D:
@@ -307,7 +352,7 @@ func _raycast(from: Vector3, dir: Vector3, max_dist: float = 100.0) -> Dictionar
 
 	spawn_tracer(muzzle.global_position, hit_position)
 
-	if debug_draw_rays and OS.is_debug_build() and debug_draw_rays:
+	if debug_draw_rays and OS.is_debug_build():
 		_debug_draw_ray(from, to, result)
 
 	return result
@@ -327,36 +372,54 @@ func _debug_draw_ray(from: Vector3, to: Vector3, result: Dictionary) -> void:
 	else:
 		# Gray: miss, full ray length
 		DebugDraw3D.draw_line(from, to, Color.GRAY, duration)
-
 func _do_raycast() -> void:
 	var aim := _get_aim_transform()
 	var from := aim.origin
-	var dir := -aim.basis.z
+
+	var spread_degrees := _get_current_spread_degrees()
+	var dir := _get_spread_direction(
+		aim,
+		spread_degrees
+	)
+
 	var result := _raycast(from, dir)
-	
+
 	if result:
 		_apply_hit(result, from)
 	else:
 		print("missed")
-
 func spawn_tracer(from: Vector3, to: Vector3) -> void:
-	var tracer = BULLET_TRACER.instantiate()
-	get_tree().current_scene.add_child(tracer)
+	if _tracer_pool.is_empty():
+		_init_tracer_pool()
+	var tracer = _tracer_pool[_tracer_i]
+	_tracer_i = (_tracer_i + 1) % TRACER_POOL_SIZE
 	tracer.setup(from, to)
 
 func _do_shotgun_raycasts() -> void:
 	var aim := _get_aim_transform()
 	var from := aim.origin
-	var spread_rad := deg_to_rad(current_weapon_data.pellet_spread_degrees)
+
+	var spread_degrees :float= (
+		current_weapon_data.pellet_spread_degrees
+		+ _get_current_spread_degrees()
+	)
+
+	var spread_rad := deg_to_rad(spread_degrees)
 
 	for i in current_weapon_data.pellet_count:
-		# Random point in a cone around the aim direction
 		var angle := randf() * TAU
-		var radius := sqrt(randf()) * tan(spread_rad)  # sqrt = even distribution
-		var local_dir := Vector3(cos(angle) * radius, sin(angle) * radius, -1.0).normalized()
-		var dir := aim.basis * local_dir
+		var radius := sqrt(randf()) * tan(spread_rad)
+
+		var local_dir := Vector3(
+			cos(angle) * radius,
+			sin(angle) * radius,
+			-1.0
+		).normalized()
+
+		var dir := (aim.basis * local_dir).normalized()
 
 		var result := _raycast(from, dir)
+
 		if result:
 			_apply_hit(result, from)
 func _apply_hit(result: Dictionary, from: Vector3) -> void:
@@ -428,9 +491,11 @@ func _get_ads_anim() -> String:
 
 
 func enter_ads() -> void:
-	
-	if is_ads or not animation_player or not current_weapon_data or player.is_sprinting or player.is_airborne or is_reloading or wall_check_ray.is_colliding():
+	if is_ads or not animation_player or not current_weapon_data or  player.is_airborne or is_reloading or wall_check_ray.is_colliding():
 		return
+	if player.is_sprinting:
+		Input.action_release("sprint")
+		await get_tree().create_timer(0.2).timeout
 	var anim := _get_ads_anim()
 	if not animation_player.has_animation(anim):
 		push_warning("Missing ADS animation: " + anim)
@@ -468,6 +533,7 @@ func _process(delta: float) -> void:
 	rotation.x = wall_avoid_rotation
 	if not current_weapon:
 		return
+	_update_accuracy(delta)
 
 	var mouse_look := look_input
 	look_input = Vector2.ZERO
@@ -538,9 +604,6 @@ func _process(delta: float) -> void:
 
 		if bob_pivot:
 			bob_pivot.rotation = Vector3.ZERO
-
-		if debug_label:
-			debug_label.text = str(current_ammo)
 
 		return
 
@@ -632,12 +695,6 @@ func _process(delta: float) -> void:
 	else:
 		bob_timer =0.0
 
-	# ---------------------------------------------------------
-	# DEBUG
-	# ---------------------------------------------------------
-	if debug_label:
-		debug_label.text = str(current_ammo)
-
 func apply_recoil() -> void:
 	var recoil_multiplier := 0.4 if is_ads else 1.0
 	recoil_offset.z += recoil_kick_back * recoil_multiplier
@@ -646,3 +703,67 @@ func _exit_tree() -> void:
 		Global.weapon_holder = null
 func add_look_input(input: Vector2) -> void:
 	look_input += input
+func _get_current_spread_degrees() -> float:
+	var spread: float = standing_spread
+
+	var move_input: Vector2 = (
+		Global.joystick.output
+		if Global.joystick
+		else Vector2.ZERO
+	)
+
+	var is_moving: bool = move_input.length() > 0.1
+
+	if player.is_airborne:
+		spread = airborne_spread
+
+	elif player.is_sprinting:
+		spread = sprinting_spread
+
+	elif player.is_crouching:
+		if is_moving:
+			spread = crouch_moving_spread
+		else:
+			spread = crouch_spread
+
+	elif is_moving:
+		spread = walking_spread
+
+	# Reduce spread while aiming down sights.
+	if is_ads:
+		spread *= ads_spread_multiplier
+
+	# Add temporary spread from repeated firing.
+	spread += current_shot_bloom
+
+	# Apply the current weapon's accuracy multiplier.
+	if is_instance_valid(current_weapon_data):
+		spread *= current_weapon_data.accuracy_multiplier
+
+	return spread
+
+func _get_spread_direction(
+	aim: Transform3D,
+	spread_degrees: float
+) -> Vector3:
+	var spread_rad := deg_to_rad(spread_degrees)
+
+	# Uniform distribution inside the aiming cone.
+	var angle := randf() * TAU
+	var radius := sqrt(randf()) * tan(spread_rad)
+
+	var local_dir := Vector3(
+		cos(angle) * radius,
+		sin(angle) * radius,
+		-1.0
+	).normalized()
+
+	return (aim.basis * local_dir).normalized()
+
+
+func _update_accuracy(delta: float) -> void:
+	current_shot_bloom = move_toward(
+		current_shot_bloom,
+		0.0,
+		bloom_recovery_speed * delta
+	)

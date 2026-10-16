@@ -22,8 +22,8 @@ transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, 0, 0)
 [node name="Sketchfab_Scene" parent="." unique_id=737826470 instance=ExtResource("1_843a7")]
 
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=1901656598]
-visible = false
 occluder = ExtResource("2_vjas1")
+bake_simplification_distance = 0.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=2118060991]
 

@@ -5,9 +5,12 @@
 [ext_resource type="AudioStream" uid="uid://c4248qcotd4sj" path="res://sounds/cs-go-headshot-sound.mp3" id="2_ur7pv"]
 [ext_resource type="Script" uid="uid://dm8mkvee2nl5r" path="res://scripts/WeaponHolder.gd" id="3_tuyoq"]
 [ext_resource type="PackedScene" uid="uid://bjl7mq13gtdsu" path="res://scenes/ak_47.tscn" id="4_fjrip"]
-[ext_resource type="PackedScene" uid="uid://dsryx4sixu3a0" path="res://scenes/bullet_tracer.tscn" id="4_smehm"]
 [ext_resource type="Script" uid="uid://ba01d02lwt0pg" path="res://scripts/third_person_rig.gd" id="5_tuyoq"]
 [ext_resource type="PackedScene" uid="uid://db4vd2isl5vb1" path="res://assets/BinbunVFX/muzzle_flash/effects/big_flash/muzzle_flash.tscn" id="6_oprun"]
+[ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="8_ur7pv"]
+[ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="9_y4r1p"]
+[ext_resource type="AudioStream" uid="uid://juw0qq8h8bev" path="res://sounds/hasin2004-breathing-fast-247449.mp3" id="10_y4r1p"]
+[ext_resource type="AudioStream" uid="uid://ircd1wbobvir" path="res://sounds/soundreality-wind-blowing-457954.mp3" id="11_d2wvv"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gyc6d"]
 radius = 0.26220703
@@ -136,6 +139,103 @@ properties/5/path = NodePath(".:sync_airborne")
 properties/5/spawn = true
 properties/5/replication_mode = 2
 
+[sub_resource type="Resource" id="Resource_gyc6d"]
+script = ExtResource("8_ur7pv")
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_d2wvv"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("9_y4r1p")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("8_ur7pv")]([SubResource("Resource_gyc6d")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_omrgh"]
+script = ExtResource("8_ur7pv")
+color = Color(0.13333334, 0.56078434, 0.972549, 1)
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_3v2ag"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("9_y4r1p")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("8_ur7pv")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_jej6c"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("9_y4r1p")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("8_ur7pv")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_ur7pv"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("9_y4r1p")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("8_ur7pv")]([SubResource("Resource_gyc6d")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_y4r1p"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("9_y4r1p")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("8_ur7pv")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
 [node name="player" type="CharacterBody3D" unique_id=1310647342]
 collision_layer = 2
 safe_margin = 0.1
@@ -169,12 +269,10 @@ current = true
 size = 0.647
 near = 0.01
 
-[node name="WeaponHolder" type="Node3D" parent="CameraPivot/Camera3D" unique_id=859068272 node_paths=PackedStringArray("debug_label", "wall_check_ray", "recoil_pivot", "bob_pivot", "animation_player")]
+[node name="WeaponHolder" type="Node3D" parent="CameraPivot/Camera3D" unique_id=859068272 node_paths=PackedStringArray("wall_check_ray", "recoil_pivot", "bob_pivot", "animation_player")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.094, -0.247, -0.17)
 script = ExtResource("3_tuyoq")
-tracer_scene = ExtResource("4_smehm")
-debug_label = NodePath("../../../Label")
 debug_draw_rays = false
 wall_check_ray = NodePath("../WallCheckRayCast3D")
 recoil_pivot = NodePath("BobPivot/RecoilPivot")
@@ -190,9 +288,6 @@ animation_player = NodePath("AnimationPlayer")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=348767866]
 libraries/ak47 = SubResource("AnimationLibrary_tuyoq")
 libraries/makarov_pistol = SubResource("AnimationLibrary_ur7pv")
-
-[node name="MuzzleFlash" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=2076730210 instance=ExtResource("6_oprun")]
-transform = Transform3D(-1.3113416e-07, 0, -3, 0, 3, 0, 3, 0, -1.3113416e-07, 0, 0.12217641, -0.8042964)
 
 [node name="WallCheckRayCast3D" type="RayCast3D" parent="CameraPivot/Camera3D" unique_id=1786052948]
 target_position = Vector3(0, 0, -0.959)
@@ -268,13 +363,66 @@ target_position = Vector3(0, -0.6, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0059216917, -0.09953672)
 target_position = Vector3(0, -0.8, 0)
 
-[node name="Label" type="Label" parent="." unique_id=1032434625]
-offset_right = 138.0
-offset_bottom = 150.0
+[node name="RespawnLabel" type="Label" parent="." unique_id=1032434625]
+anchors_preset = -1
+anchor_left = 0.48700002
+anchor_top = 0.62200004
+anchor_right = 0.48700002
+anchor_bottom = 0.62200004
+offset_left = -321.36005
+offset_top = -91.84003
+offset_right = 320.63995
+offset_bottom = 92.15997
+theme_override_font_sizes/font_size = 31
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=893049359]
-replication_interval = 0.05
+replication_interval = 0.025
 replication_config = SubResource("SceneReplicationConfig_fjrip")
+
+[node name="RespawnContainer" type="HBoxContainer" parent="." unique_id=1847315167]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -338.0
+offset_top = -150.0
+offset_right = 338.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="RespawnButton" type="Button" parent="RespawnContainer" unique_id=1885493177]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBox_d2wvv")
+theme_override_styles/pressed = SubResource("StyleBox_3v2ag")
+theme_override_styles/hover = SubResource("StyleBox_jej6c")
+text = "RESPAWN"
+
+[node name="LoadoutButton" type="Button" parent="RespawnContainer" unique_id=1345244167]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBox_ur7pv")
+theme_override_styles/pressed = SubResource("StyleBox_y4r1p")
+theme_override_styles/hover = SubResource("StyleBox_y4r1p")
+text = "LOADOUT"
+
+[node name="Breathing" type="AudioStreamPlayer3D" parent="." unique_id=1012305270]
+stream = ExtResource("10_y4r1p")
+volume_db = -42.5
+pitch_scale = 0.4
+autoplay = true
+
+[node name="Wind" type="AudioStreamPlayer3D" parent="." unique_id=890627926]
+stream = ExtResource("11_d2wvv")
+volume_db = -37.5
+pitch_scale = 0.75
+autoplay = true
 
 [editable path="ThirdPersonRig/mesh"]
 [editable path="ThirdPersonRig/mesh/model"]

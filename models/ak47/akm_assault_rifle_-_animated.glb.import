@@ -2100,34 +2100,44 @@ _subresources={
 },
 "nodes": {
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/Null/Object_5/Skeleton3D/Object_67": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_base_M_AKM_body_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_base_M_AKM_furniture_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_ejectionport/akm_ejectionport_M_AKM_body_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_magazine/akm_bullet1/akm_bullet1_Material_012_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_magazine/akm_bullet2/akm_bullet2_Material_012_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_magazine/akm_bullet3/akm_bullet3_Material_012_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_magazine/akm_magazine_Material_012_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_release/akm_release_M_AKM_body_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 },
 "PATH:Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_trigger/akm_trigger_M_AKM_body_0": {
-"mesh_instance/cast_shadow": 0
+"mesh_instance/cast_shadow": 0,
+"mesh_instance/layers": 2
 }
 }
 }
