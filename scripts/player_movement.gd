@@ -127,7 +127,7 @@ var active_recoil_decay_speed: float = 6.0
 var sync_falling := false
 
 var _state_sync_timer := 0.0
-const STATE_SYNC_INTERVAL := 0.025
+const STATE_SYNC_INTERVAL := 0.0
 @onready var loadout_button: Button = $RespawnContainer/LoadoutButton
 var _loadout_layer: CanvasLayer = null
 @onready var respawn_container: Control = $RespawnContainer
