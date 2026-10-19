@@ -69,6 +69,10 @@ reload={
 "deadzone": 0.2,
 "events": []
 }
+throw_grenade={
+"deadzone": 0.2,
+"events": []
+}
 
 [input_devices]
 

@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://c01cfikl2okxf"]
+
+[ext_resource type="Script" uid="uid://b4nrh0je2abka" path="res://scripts/explosion.gd" id="1_17npe"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6qx4q"]
+
+[sub_resource type="Sky" id="Sky_gyc6d"]
+sky_material = SubResource("ProceduralSkyMaterial_6qx4q")
+radiance_size = 0
+
+[sub_resource type="Environment" id="Environment_g7b7a"]
+background_mode = 2
+sky = SubResource("Sky_gyc6d")
+
+[node name="explosion" type="Node3D" unique_id=2108546660]
+script = ExtResource("1_17npe")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=382248954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.446314)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=672982848]
+environment = SubResource("Environment_g7b7a")

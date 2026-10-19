@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://dt2ogsgc4lej7"]
+
+[ext_resource type="PackedScene" uid="uid://c4r8t6e6250x3" path="res://models/grenade throw/fps_arms_throwing.glb" id="1_ero1c"]
+[ext_resource type="Animation" uid="uid://bbcp3ilq4nvt8" path="res://animations/arms/grenade_throw.res" id="2_kmudp"]
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_n8hyf"]
+_data = {
+&"grenade_throw": ExtResource("2_kmudp")
+}
+
+[node name="grenade_arms" type="Node3D" unique_id=2054167381]
+transform = Transform3D(-0.01, 0, -8.7422775e-10, 0, 0.01, 0, 8.7422775e-10, 0, -0.01, 0, 0, 0)
+
+[node name="model" parent="." unique_id=332851641 instance=ExtResource("1_ero1c")]
+
+[node name="L_wrist_Goal" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(332851641, 1421994613) index="0" unique_id=1500364426]
+transform = Transform3D(-0.5349626, 0.70336026, 0.46808052, 0.8434831, 0.47641936, 0.2481144, -0.048488807, 0.5275499, -0.8481391, 29.152405, -15.803722, -11.406351)
+
+[node name="R_wrist_Goal" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(332851641, 1421994613) index="1" unique_id=1888176770]
+transform = Transform3D(-0.7276169, -0.47501516, -0.49490815, -0.57768005, 0.813373, 0.068629436, 0.36994496, 0.3358346, -0.8662307, -13.926631, -8.52825, -6.059014)
+
+[node name="Skeleton3D" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode/Root/Object_9" parent_id_path=PackedInt32Array(332851641, 416615266) index="0" unique_id=632837462]
+bones/2/rotation = Quaternion(-0.052734565, 0.548839, 0.8158172, -0.17446265)
+bones/3/rotation = Quaternion(0.7778045, -0.13856947, -0.05018923, 0.6109827)
+bones/4/rotation = Quaternion(-0.11718452, -0.16692914, 0.52153444, 0.8284953)
+bones/6/rotation = Quaternion(-0.048542816, 0.1200894, 0.16147129, 0.9783401)
+bones/9/rotation = Quaternion(-0.15880609, 0.0414707, -0.117777474, 0.9793821)
+bones/10/rotation = Quaternion(-0.11807223, -0.006114597, -0.029995872, 0.9925331)
+bones/11/rotation = Quaternion(-0.08096575, 0.06666599, 0.03779725, 0.99376637)
+bones/13/rotation = Quaternion(-0.08328775, 0.07298675, -0.13341597, 0.9848535)
+bones/15/rotation = Quaternion(-0.20398565, 0.018650204, 0.0038868196, 0.9787885)
+bones/18/rotation = Quaternion(-0.2008546, -0.19534843, 0.7187565, 0.6363062)
+bones/19/rotation = Quaternion(-0.2910734, 0.02256693, 0.026621612, 0.956064)
+bones/20/rotation = Quaternion(-0.26901603, 0.017132647, 0.004786182, 0.9629714)
+bones/23/rotation = Quaternion(-0.1936462, 0.0026937167, 0.0005316943, 0.9810676)
+bones/26/rotation = Quaternion(0.42876512, 0.7920287, 0.40426388, 0.15944159)
+bones/27/rotation = Quaternion(0.57165754, 0.268799, -0.13975208, 0.7625117)
+bones/28/rotation = Quaternion(-0.023939189, -0.031583466, -0.49357557, 0.86879957)
+bones/29/rotation = Quaternion(-0.038149398, 0.38040388, 0.496432, 0.7793542)
+bones/30/rotation = Quaternion(-0.28248125, -0.20230326, -0.024828358, 0.93736935)
+bones/33/rotation = Quaternion(-0.21152994, -0.05402479, 0.06089247, 0.97397566)
+bones/34/rotation = Quaternion(-0.37287307, 0.025839949, -0.06886041, 0.9249629)
+bones/35/rotation = Quaternion(-0.58009934, -0.028265184, -0.0031562624, 0.81404907)
+bones/37/rotation = Quaternion(-0.2533918, -0.0735567, -0.025632584, 0.9642225)
+bones/38/rotation = Quaternion(-0.49467188, 0.087111436, -0.04077048, 0.86374134)
+bones/39/rotation = Quaternion(-0.49257562, -0.009705987, -0.0038996898, 0.87020683)
+bones/42/rotation = Quaternion(-0.063880704, -0.053021505, -0.70091313, 0.70839876)
+bones/43/rotation = Quaternion(-0.6673831, 0.005472109, -0.071210116, 0.74128205)
+bones/44/rotation = Quaternion(-0.41701284, -0.041191448, 0.01536719, 0.9078367)
+bones/46/rotation = Quaternion(-0.06344703, -0.027081246, -0.7494836, 0.65841895)
+bones/47/rotation = Quaternion(-0.5384955, -0.0018985096, -0.044826545, 0.8414331)
+bones/48/rotation = Quaternion(-0.44015893, -0.030481996, -0.047303505, 0.89615476)
+
+[node name="AnimationPlayer" parent="model" index="1" unique_id=1399989754]
+libraries/ = SubResource("AnimationLibrary_n8hyf")
+
+[editable path="model"]

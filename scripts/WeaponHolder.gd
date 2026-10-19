@@ -5,6 +5,12 @@ extends Node3D
 var crosshair: Control
 var last_holder_bob_offset: Vector3 = Vector3.ZERO
 var tp_rig : Node3D = null
+@onready var grenade_arms: Node3D = get_node_or_null("grenade_arms")
+
+var _gren_ap: AnimationPlayer = null
+var _gren_anim := ""
+var _grenade_held := false
+var _grenade_hold_pos := 0.0
 
 var wall_avoid_rotation: float = 0.0
 var _tracer_pool: Array[Node3D] = []
@@ -37,7 +43,7 @@ var _hole_i := 0
 @export var wall_check_ray: RayCast3D
 @export var wall_avoid_angle: float = 90.0
 @export var wall_avoid_speed: float = 8.0
-
+var land_kick_y := 0.0
 @export var recoil_pivot: Node3D
 var muzzle: Marker3D = null
 
@@ -206,6 +212,8 @@ func equip_weapon(weapon_data: WeaponData, scope_index := -1) -> void:
 
 func apply_loadout_on_respawn() -> void:
 	is_firing = false
+	reset_grenade_fp()
+	hide_grenade_arms()
 	is_reloading = false   # a reload cut off by death never finishes
 	if is_ads:
 		var anim := _get_ads_anim()
@@ -224,6 +232,97 @@ func apply_loadout_on_respawn() -> void:
 		equip_weapon(Loadout.weapon_data, Loadout.scope_index)
 	elif current_weapon_data:
 		current_ammo = current_weapon_data.magazine_size
+		if current_weapon and current_weapon.weapon_anim_player \
+		and current_weapon.weapon_anim_player.has_animation("equip"):
+			current_weapon.weapon_anim_player.play("equip")
+
+func _find_grenade_anim() -> bool:
+	_gren_ap = null
+	_gren_anim = ""
+	var roots: Array[Node] = []
+	if grenade_arms:
+		roots.append(grenade_arms)
+	if current_weapon:
+		roots.append(current_weapon)
+	for r in roots:
+		for node in r.find_children("*", "AnimationPlayer", true, false):
+			var ap := node as AnimationPlayer
+			for a in ap.get_animation_list():
+				if str(a).ends_with("grenade_throw"):
+					_gren_ap = ap
+					_gren_anim = str(a)
+					return true
+	return false
+
+
+func start_grenade_fp() -> void:
+	_grenade_held = false
+	if not _find_grenade_anim():
+		push_warning("grenade_throw animation not found")
+		return
+	_gren_ap.speed_scale = 1.0
+	_gren_ap.play(_gren_anim)
+
+
+func hold_grenade_fp(at: float) -> void:
+	if _gren_ap == null:
+		return
+	var length := _gren_ap.get_animation(_gren_anim).length
+	_grenade_hold_pos = clampf(at, 0.0, maxf(length - 0.05, 0.0))
+	_gren_ap.speed_scale = 1.0
+	_gren_ap.play(_gren_anim)
+	_gren_ap.seek(_grenade_hold_pos, true)
+	_gren_ap.pause()
+	_grenade_held = true
+
+
+func grenade_fp_position() -> float:
+	if _gren_ap == null:
+		return 0.0
+	if _grenade_held:
+		return _grenade_hold_pos
+	if _gren_ap.current_animation == _gren_anim:
+		return _gren_ap.current_animation_position
+	return 0.0
+
+
+func resume_grenade_fp() -> void:
+	if _gren_ap == null:
+		return
+	var length := _gren_ap.get_animation(_gren_anim).length
+	var pos := 0.0
+	if _grenade_held:
+		pos = _grenade_hold_pos
+		_gren_ap.speed_scale = 1.0
+		_gren_ap.play(_gren_anim)
+		_gren_ap.seek(pos, true)
+		_grenade_held = false
+	elif _gren_ap.is_playing():
+		pos = _gren_ap.current_animation_position
+	else:
+		pos = length
+	await get_tree().create_timer(maxf(length - pos, 0.0)).timeout
+
+
+func reset_grenade_fp() -> void:
+	_grenade_held = false
+	if is_instance_valid(_gren_ap):
+		_gren_ap.speed_scale = 1.0
+
+
+
+func show_grenade_arms() -> void:
+	if bob_pivot:
+		bob_pivot.hide()
+	if grenade_arms:
+		grenade_arms.show()
+
+
+func hide_grenade_arms() -> void:
+	if grenade_arms:
+		grenade_arms.hide()
+	if bob_pivot:
+		bob_pivot.show()
 
 func _physics_process(_delta: float) -> void:
 	process_weapon_input()
@@ -232,6 +331,8 @@ func process_weapon_input() -> void:
 		return
 
 	if is_reloading:
+		return
+	if player and player._throwing:
 		return
 
 	if current_ammo <= 0:
@@ -269,7 +370,16 @@ func process_weapon_input() -> void:
 		start_reload()
 
 
-
+## Plays a weapon animation and waits for its full length.
+## Returns right away if the animation doesn't exist.
+func play_weapon_anim(anim_name: String) -> void:
+	var ap := current_weapon.weapon_anim_player if current_weapon else null
+	if ap == null or not ap.has_animation(anim_name):
+		return
+	ap.speed_scale = 1.0
+	ap.play(anim_name)
+	var length := ap.get_animation(anim_name).length / maxf(ap.speed_scale, 0.01)
+	await get_tree().create_timer(length).timeout
 
 func start_reload() -> void:
 	if is_ads:
@@ -385,7 +495,9 @@ func _do_raycast() -> void:
 	var result := _raycast(from, dir)
 
 	if result:
-		_apply_hit(result, from)
+		if result.collider is CharacterBody3D:
+			_apply_hit(result, from)
+			$HitSound.play()
 	else:
 		print("missed")
 func spawn_tracer(from: Vector3, to: Vector3) -> void:
@@ -564,7 +676,7 @@ func _process(delta: float) -> void:
 	)
 
 	if recoil_pivot:
-		recoil_pivot.position = recoil_offset
+		recoil_pivot.position = recoil_offset + Vector3(0.0, land_kick_y, 0.0)
 	# ---------------------------------------------------------
 	# IDLE WEAPON ANIMATION (POSITION ONLY)
 	# ---------------------------------------------------------
@@ -633,6 +745,8 @@ func _process(delta: float) -> void:
 		and not is_firing
 		and player != null
 		and player.velocity.length() > 0.1
+		and not player.is_airborne
+		and not player.is_landing
 	)
 
 	var rest_offset: Vector3 = (

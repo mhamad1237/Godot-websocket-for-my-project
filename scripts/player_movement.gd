@@ -4,9 +4,22 @@ extends CharacterBody3D
 const WALK_SPEED := 3.0
 const SPRINT_SPEED := 6.0
 const CROUCH_SPEED := 1.5
-var _was_moving : bool = false
 var _idle_frames : int = 0
+const GRENADE_EXPLOSION = preload(
+	"res://scenes/explosion.tscn"
+)
 var _has_triggered_start_step : bool = false
+const GRENADE_SHOT := "parameters/GrenadeShot/request"
+const GRENADE_FUSE := 3.5            # seconds from the moment you start cooking
+const GRENADE_FP_PAUSE_TIME := 0.15  # seconds into the FP grenade_throw
+const GRENADE_TP_PAUSE_TIME := 0.83   # seconds into the TP throw
+const GRENADE_THROW_SPEED := 12.0
+const GRENADE_RELEASE_TIME := 0.2    # seconds into the FP throw when it leaves the hand
+var _fp_held := false
+var _tp_held := false
+@onready var grenade_label: Label = get_node_or_null("GrenadeLabel")
+var _throwing := false
+var _throw_id := 0   # changes when a throw is cancelled (death)
 
 var fade_speed : float = 40.0  # Speed of the volume fade per second
 
@@ -121,6 +134,17 @@ var _loadout_layer: CanvasLayer = null
 @onready var respawn_button: Button = $RespawnContainer/RespawnButton
 var _death_time_ms := 0
 var current_collision_mode := ""
+@export_category("LAND KICK TUNING")
+const LAND_KICK_MIN_SPEED := 4.0    # slower landings do nothing
+const LAND_KICK_MAX_SPEED := 16.0   # speed that gives the biggest kick
+const LAND_KICK_MIN := 0.04         # camera dip at the minimum speed
+const LAND_KICK_MAX := 0.3          # camera dip at the maximum speed
+var land_kick_y := 0.0
+var _fall_speed := 0.0
+var _land_tween: Tween
+var _weapon_tween: Tween
+const AIR_FLOAT_JUMP := 0.02   # weapon lift when jumping
+const AIR_FLOAT_FALL := 0.03   # weapon lift when falling off a ledge
 func _ready() -> void:
 	if not NetworkManager.dedicated:   # the headless server needs no audio
 		_load_footsteps()
@@ -144,14 +168,14 @@ func _ready() -> void:
 		camera.current = true
 		head_bob_base_position = camera_pivot.position
 		NetworkManager.notify_local_player_ready()
-		#tps_rig.hide()
+		tps_rig.hide()
 		health = max_health
 		get_tree().call_group("hud", "bind_player", self)
 		call_deferred("_init_walking_animation")
 
 	else:
 		camera.current = false
-		weapon_holder.bob_pivot.hide()
+		weapon_holder.hide()
 		set_physics_process(false)
 		call_deferred("_init_walking_animation")
 	set_collision("standing")
@@ -332,6 +356,8 @@ func update_cam_recoil(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		last_frame_was_on_floor = Engine.get_physics_frames()
+	if Input.is_action_just_pressed("throw_grenade"):
+		_try_throw_grenade()
 
 	desired_velocity = Vector3.ZERO
 	var raw_input := get_dead_zoned_input()
@@ -457,6 +483,8 @@ func process_landing(delta: float) -> void:
 			reset_jump_blend()
 func process_airborne(delta: float, raw_input: Vector2) -> void:
 	velocity.y -= GRAVITY * delta
+	_fall_speed = maxf(-velocity.y, 0.0)
+
 
 	var jump_playback: AnimationNodeStateMachinePlayback = anim_tree.get(
 		"parameters/Jumping/playback"
@@ -481,6 +509,42 @@ func process_airborne(delta: float, raw_input: Vector2) -> void:
 		is_landing = true
 		is_airborne = false
 		set_collision("standing")
+		_land_kick(_fall_speed)
+func _air_weapon_float(jumping: bool) -> void:
+	if not weapon_holder:
+		return
+	if _weapon_tween:
+		_weapon_tween.kill()
+	_weapon_tween = create_tween()
+	var amount := AIR_FLOAT_JUMP if jumping else AIR_FLOAT_FALL
+	var time := 0.15 if jumping else 0.35
+	_weapon_tween.tween_property(weapon_holder, "land_kick_y", amount, time) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+func _land_kick(speed: float) -> void:
+	var kick := 0.0
+	if speed >= LAND_KICK_MIN_SPEED:
+		var t := clampf(inverse_lerp(LAND_KICK_MIN_SPEED, LAND_KICK_MAX_SPEED, speed), 0.0, 1.0)
+		kick = lerpf(LAND_KICK_MIN, LAND_KICK_MAX, t)
+
+		# Camera: quick dip, slower recovery
+		if _land_tween:
+			_land_tween.kill()
+		_land_tween = create_tween()
+		_land_tween.tween_property(self, "land_kick_y", -kick, 0.07) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		_land_tween.tween_property(self, "land_kick_y", 0.0, 0.35) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+
+	# Weapon: always settles back from the air float, dips only on a real landing
+	if weapon_holder:
+		if _weapon_tween:
+			_weapon_tween.kill()
+		_weapon_tween = create_tween()
+		if kick > 0.0:
+			_weapon_tween.tween_property(weapon_holder, "land_kick_y", -kick * 0.5, 0.12) \
+				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		_weapon_tween.tween_property(weapon_holder, "land_kick_y", 0.0, 0.35) \
+			.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 func has_valid_landing_surface() -> bool:
 	if not stairs_below_raycast.is_colliding():
 		return false
@@ -490,6 +554,11 @@ func has_valid_landing_surface() -> bool:
 
 	return distance >= 0.0 and distance <= 0.15
 func enter_air() -> void:
+	# Jumping or falling cancels sprint (sprint is a toggle)
+	if is_sprinting:
+		is_sprinting = false
+	Input.action_release("sprint")
+	_air_weapon_float(velocity.y > 0)
 	is_airborne = true
 	is_landing = false
 	has_switched_to_jump_loop = false
@@ -511,8 +580,7 @@ func enter_air() -> void:
 	if jump_playback:
 		jump_playback.travel("JumpStart")
 func _set_pivot_position() -> void:
-	camera_pivot.position = head_bob_base_position + head_bob_offset + Vector3(0.0, landing_offset_y, 0.0)
-	
+	camera_pivot.position = head_bob_base_position + head_bob_offset + Vector3(0.0, landing_offset_y + land_kick_y, 0.0)
 func try_jump() -> void:
 	if is_on_floor() or snapped_to_stairs_last_frame:
 		velocity.y = JUMP_VELOCITY
@@ -657,7 +725,7 @@ func set_locomotion_anim(anim_name: String) -> void:
 		locomotion_playback.travel(anim_name)
 	var spine_tween := create_tween()
 	spine_tween.tween_property(anim_tree, "parameters/SpineHipLock/blend_amount", 0.0, 0.2)
-	
+
 func update_head_bob(delta: float) -> void:
 	if not head_bob_enabled:
 		return
@@ -872,9 +940,14 @@ func sync_weapon(weapon_name: String, weapon_type: String) -> void:
 	tps_rig.equip_tps_weapon(TpWeaponPaths.get_data(weapon_name))
 	var new_stance := Stance.PISTOL if weapon_type.to_lower() == "pistol" else Stance.RIFLE
 	set_stance(new_stance)
-@rpc("authority", "call_remote", "unreliable")
-func sync_muzzle_flash() -> void:
-	tps_rig.play_muzzle_flash()
+func play_grenade_tp() -> void:
+	anim_tree.set(GRENADE_SHOT, AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+
+
+@rpc("authority", "call_remote", "reliable")
+func sync_grenade_throw() -> void:
+	play_grenade_tp()
+
 func take_damage(amount: float) -> void:
 	if is_dead or is_multiplayer_authority():
 		return  # dead, or you shot yourself
@@ -921,9 +994,19 @@ func _die(attacker_id: int) -> void:
 	current_collision_mode = ""
 
 	if is_multiplayer_authority():
+		tps_rig.skeletonIK.start()
 		set_physics_process(false)
 		weapon_holder.hide()
+		weapon_holder.reset_grenade_fp()
 		is_crouching = false
+		_throwing = false
+		_throw_id += 1
+		_fp_held = false
+		_tp_held = false
+		set_grenade_tp_hold(false)
+		anim_tree.set("parameters/GrenadeShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+		if grenade_label:
+			grenade_label.hide()
 		is_sprinting = false
 		current_crouch_mode = ""
 		sync_crouching = false
@@ -942,6 +1025,7 @@ func _die(attacker_id: int) -> void:
 
 	# Owner sees a countdown, then gets the buttons
 	if is_multiplayer_authority():
+		weapon_holder.hide_grenade_arms()
 		var end_ms := _death_time_ms + int(RESPAWN_TIME * 1000.0)
 		respawn_label.show()
 		while is_dead and is_inside_tree():
@@ -1120,3 +1204,137 @@ func _play_footstep() -> void:
 	p.volume_db = -10
 	p.pitch_scale = randf_range(0.95, 1.05) * pitch_mult
 	p.play()
+func _try_throw_grenade() -> void:
+	if _throwing or is_dead or is_airborne or is_landing:
+		return
+	if weapon_holder.is_reloading or weapon_holder.is_ads:
+		return
+	_throwing = true
+
+	tps_rig.skeletonIK.stop()
+	_throw_id += 1
+	var id := _throw_id
+	_fp_held = false
+	_tp_held = false
+	is_sprinting = false
+	Input.action_release("sprint")
+
+	# 1) FP: weapon hides
+	await weapon_holder.play_weapon_anim("hide")
+	if id != _throw_id:
+		return
+	weapon_holder.show_grenade_arms()   # bob_pivot hides, grenade_arms shows
+
+	# 2) Start both throws, each with its OWN pause timer
+
+	weapon_holder.start_grenade_fp()
+	play_grenade_tp()
+	sync_grenade_throw.rpc()
+
+	get_tree().create_timer(GRENADE_FP_PAUSE_TIME).timeout.connect(func() -> void:
+		if id == _throw_id and Input.is_action_pressed("throw_grenade"):
+			weapon_holder.hold_grenade_fp(GRENADE_FP_PAUSE_TIME)   # was pause_grenade_fp()
+			_fp_held = true)
+
+	get_tree().create_timer(GRENADE_TP_PAUSE_TIME).timeout.connect(func() -> void:
+		if id == _throw_id and Input.is_action_pressed("throw_grenade"):
+			set_grenade_tp_hold(true)
+			sync_grenade_hold.rpc(true)
+			_tp_held = true)
+
+	# Wait for both pause points, but stop early if the button is released
+	var t := 0.0
+	var wait := maxf(GRENADE_FP_PAUSE_TIME, GRENADE_TP_PAUSE_TIME) + 0.05
+	while t < wait and Input.is_action_pressed("throw_grenade"):
+		await get_tree().process_frame
+		if id != _throw_id:
+			return
+		t += get_process_delta_time()
+
+	# 3) Cook while both are held and the button stays down
+	var fuse := GRENADE_FUSE
+	while Input.is_action_pressed("throw_grenade") and fuse > 0.0:
+		fuse -= get_process_delta_time()
+		if grenade_label:
+			grenade_label.text = "%.1f" % maxf(fuse, 0.0)
+			grenade_label.show()
+		await get_tree().process_frame
+		if id != _throw_id:
+			return
+	if grenade_label:
+		grenade_label.hide()
+
+	# 4) Resume whatever is paused
+	if _tp_held:
+		set_grenade_tp_hold(false)
+		sync_grenade_hold.rpc(false)
+		_tp_held = false
+	_fp_held = false
+
+	var release_in := maxf(GRENADE_RELEASE_TIME - weapon_holder.grenade_fp_position(), 0.0)
+	if fuse <= 0.0:
+		_on_grenade_cooked_off()
+	else:
+		var fuse_at_release := maxf(fuse - release_in, 0.0)
+		get_tree().create_timer(release_in).timeout.connect(func() -> void:
+			if id == _throw_id:
+				_on_grenade_release(fuse_at_release))
+
+	await weapon_holder.resume_grenade_fp()
+	if id != _throw_id:
+		return
+	weapon_holder.hide_grenade_arms()   # opposite: arms hide, bob_pivot shows
+
+	await weapon_holder.play_weapon_anim("equip")
+	if id == _throw_id:
+		_throwing = false
+		tps_rig.skeletonIK.start()
+
+
+func _on_grenade_release(fuse_left: float) -> void:
+	var t := camera.global_transform
+	var dir := -t.basis.z
+	var origin := t.origin + dir * 0.5
+	var vel := dir * GRENADE_THROW_SPEED + Vector3.UP * 2.0 + velocity * 0.5
+	_launch_grenade(origin, vel, fuse_left)
+
+
+func _on_grenade_cooked_off() -> void:
+	_launch_grenade(global_position + Vector3.UP, Vector3.ZERO, 0.0)
+
+
+func _launch_grenade(origin: Vector3, vel: Vector3, fuse_left: float) -> void:
+	if multiplayer.is_server():
+		_server_spawn_grenade(origin, vel, fuse_left)
+	else:
+		_request_grenade.rpc_id(1, origin, vel, fuse_left)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_grenade(origin: Vector3, vel: Vector3, fuse_left: float) -> void:
+	if not multiplayer.is_server():
+		return
+	if multiplayer.get_remote_sender_id() != get_multiplayer_authority() or is_dead:
+		return
+	if origin.distance_to(global_position) > 6.0:
+		return   # thrown from too far from where the server has this player
+	var max_speed := GRENADE_THROW_SPEED * 2.0
+	if vel.length() > max_speed:
+		vel = vel.normalized() * max_speed
+	_server_spawn_grenade(origin, vel, clampf(fuse_left, 0.0, GRENADE_FUSE))
+
+
+func _server_spawn_grenade(origin: Vector3, vel: Vector3, fuse_left: float) -> void:
+	var spawner := get_tree().get_first_node_in_group("grenade_spawner") as MultiplayerSpawner
+	if spawner == null:
+		push_error("No GrenadeSpawner in the game scene")
+		return
+	spawner.spawn({"pos": origin, "vel": vel, "fuse": fuse_left, "owner": get_multiplayer_authority()})
+
+func set_grenade_tp_hold(on: bool) -> void:
+	anim_tree.set("parameters/GrenadeTimeScale/scale", 0.0 if on else 1.0)
+
+
+@rpc("authority", "call_remote", "reliable")
+func sync_grenade_hold(on: bool) -> void:
+	set_grenade_tp_hold(on)

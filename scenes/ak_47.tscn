@@ -1,61 +1,28 @@
 [gd_scene format=3 uid="uid://bjl7mq13gtdsu"]
 
-[ext_resource type="PackedScene" uid="uid://bu0qoi4qx8uj0" path="res://models/ak47/akm_assault_rifle_-_animated.glb" id="1_sj0nw"]
 [ext_resource type="Script" uid="uid://clqcxaokcphpq" path="res://scripts/ak_47.gd" id="1_t60o2"]
 [ext_resource type="Script" uid="uid://bdpp2tfxfnt44" path="res://scripts/animation_player_ak47.gd" id="2_8s1la"]
-[ext_resource type="Animation" uid="uid://dsi35r1tx2i32" path="res://models/ak47/reload.res" id="2_x8jse"]
-[ext_resource type="Animation" uid="uid://dxp5bwisqe2wl" path="res://models/ak47/equip.res" id="3_0bji5"]
-[ext_resource type="Animation" uid="uid://ci1umblqwy74j" path="res://models/ak47/ak_animations.res" id="3_mpgmn"]
 [ext_resource type="AudioStream" uid="uid://rhiu4hyqcy8e" path="res://sounds/ak bolt.mp3" id="3_q6xt7"]
+[ext_resource type="PackedScene" uid="uid://bu0qoi4qx8uj0" path="res://models/ak47/akm_assault_rifle_-_animated.glb" id="3_s2423"]
+[ext_resource type="Animation" uid="uid://ci1umblqwy74j" path="res://models/ak47/ak_animations.res" id="4_af8lr"]
 [ext_resource type="AudioStream" uid="uid://dai8d5ts2c8wu" path="res://sounds/ak reload(1).mp3" id="4_x8jse"]
 [ext_resource type="AudioStream" uid="uid://drgo5ukasgc3p" path="res://sounds/ak reload(2).mp3" id="5_0gusv"]
+[ext_resource type="Animation" uid="uid://dxp5bwisqe2wl" path="res://models/ak47/equip.res" id="5_bnrtc"]
+[ext_resource type="Animation" uid="uid://dgxt5qa3y0pjq" path="res://models/ak47/hide.res" id="6_plb3t"]
+[ext_resource type="Animation" uid="uid://dsi35r1tx2i32" path="res://models/ak47/reload.res" id="7_b4dpx"]
 [ext_resource type="AudioStream" uid="uid://dmsch6cwqklp7" path="res://sounds/ak equip.mp3" id="8_hpwu8"]
 [ext_resource type="AudioStream" uid="uid://c38ty3q7by7we" path="res://sounds/ak shot.mp3" id="8_t60o2"]
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_0gusv"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hta24"]
 _data = {
-&"ak_animations": ExtResource("3_mpgmn"),
-&"equip": ExtResource("3_0bji5"),
-&"reload": ExtResource("2_x8jse")
+&"Scene": ExtResource("4_af8lr"),
+&"equip": ExtResource("5_bnrtc"),
+&"hide": ExtResource("6_plb3t"),
+&"reload": ExtResource("7_b4dpx")
 }
 
 [node name="weapon" type="Node3D" unique_id=1673703102]
 script = ExtResource("1_t60o2")
-
-[node name="model" parent="." unique_id=678145553 instance=ExtResource("1_sj0nw")]
-
-[node name="akm_base" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(678145553, 552738052) index="2" unique_id=817170983]
-transform = Transform3D(-0.9999998, -8.742275e-08, -3.8213697e-15, 0, -4.3711374e-08, 0.9999997, -8.742276e-08, 0.9999997, 4.3711374e-08, 0, 0.11135365, 4.9806566)
-
-[node name="RemoteTransform3D" type="RemoteTransform3D" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base/akm_base_M_AKM_body_0" parent_id_path=PackedInt32Array(678145553, 2053836550) index="0" unique_id=185583248]
-transform = Transform3D(-1, -5.684342e-14, -8.742277e-08, -3.821371e-15, 0.9999999, 1.4210855e-14, 8.742278e-08, 3.5527137e-15, -0.9999999, -0.43186757, 13.208925, 12.955065)
-remote_path = NodePath("../../../../../../../../ScopeMount")
-update_scale = false
-
-[node name="akm_magazine" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="2" unique_id=959090787]
-transform = Transform3D(1, -2.9154452e-09, 1.6639574e-16, 2.9154452e-09, 1, -1.457731e-09, -1.6214581e-16, 1.457731e-09, 1, 9.329423e-08, 0.9827982, 16.561815)
-
-[node name="akm_trigger" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="3" unique_id=1658051253]
-transform = Transform3D(1, 0, -4.2377607e-35, 0, 1, -1.4210855e-14, 4.2377607e-35, 1.4210855e-14, 1, 5.293956e-23, 4.790164, 5.5018334)
-
-[node name="akm_release" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="4" unique_id=527177802]
-transform = Transform3D(1, -4.2166888e-27, -1.5612512e-18, 1.5994252e-27, 1, -1.6763885e-09, 1.5612512e-18, 1.6763885e-09, 1, 0, 1.7743053, 11.586392)
-
-[node name="akm_ejectionport" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="5" unique_id=1500090724]
-transform = Transform3D(1, -4.5e-44, -3.1554436e-30, 0, 1, -1.4210855e-14, 3.1554436e-30, 1.4210855e-14, 1, -8.7892665e-17, 9.246904, 21.88217)
-
-[node name="AnimationPlayer" parent="model" index="1" unique_id=1899898470]
-libraries/ = SubResource("AnimationLibrary_0gusv")
-script = ExtResource("2_8s1la")
-bolt_sound = ExtResource("3_q6xt7")
-equip_sound = ExtResource("8_hpwu8")
-reload1 = ExtResource("4_x8jse")
-reload2 = ExtResource("5_0gusv")
-
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="model/AnimationPlayer" index="0" unique_id=724470599]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1522694, 0.54278094)
-stream = ExtResource("3_q6xt7")
-volume_db = 7.5
 
 [node name="shoot_sound" type="AudioStreamPlayer3D" parent="." unique_id=65614066]
 stream = ExtResource("8_t60o2")
@@ -65,6 +32,80 @@ volume_db = -2.5
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.127, -0.756)
 
 [node name="ScopeMount" type="Node3D" parent="." unique_id=534826225]
-transform = Transform3D(0.9999441, -8.74171e-08, 8.741846e-08, 8.741789e-08, 0.9999358, -4.3709196e-08, -8.741788e-08, 4.3708575e-08, 0.9999504, 0.0043186634, 0.18189578, -0.13066414)
+transform = Transform3D(1, -8.742278e-08, 8.742278e-08, 8.7422784e-08, 1, -4.371138e-08, -8.742277e-08, 4.371139e-08, 1, 0.004318664, 0.1818958, -0.13066417)
+
+[node name="Node" type="Node" parent="." unique_id=139980692]
+
+[node name="model" parent="." unique_id=133579927 instance=ExtResource("3_s2423")]
+
+[node name="Skeleton3D" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/Null/Object_5" parent_id_path=PackedInt32Array(133579927, 1467124323) index="0" unique_id=631972641]
+bones/2/rotation = Quaternion(-0.6063799, 0.78482026, 0.12194959, 0.038585402)
+bones/3/rotation = Quaternion(0.47642192, -0.20556702, 0.7230815, 0.45597976)
+bones/4/rotation = Quaternion(-0.092077784, 0.11671072, -2.3369373e-07, 0.9888885)
+bones/5/rotation = Quaternion(0.19452529, 0.033852763, -0.35158387, 0.9150971)
+bones/6/rotation = Quaternion(-0.15914488, 0.056631, -0.08884679, 0.9816171)
+bones/7/rotation = Quaternion(-0.063634254, 0.07912525, -0.049001545, 0.99362403)
+bones/10/rotation = Quaternion(-0.18637453, -0.07589026, 0.43321717, 0.8785375)
+bones/11/rotation = Quaternion(-0.050838992, -0.4861736, 0.0028996852, 0.87237734)
+bones/12/rotation = Quaternion(-0.03175568, -0.22170025, -0.0019567925, 0.97459567)
+bones/15/rotation = Quaternion(0.028942887, -0.46910533, 0.44518012, 0.7621792)
+bones/16/rotation = Quaternion(0.022279331, -0.19479005, 0.0044256034, 0.980582)
+bones/17/rotation = Quaternion(-0.011774506, -0.31745252, 0.00053512846, 0.94820094)
+bones/20/rotation = Quaternion(-0.4615759, 0.88279706, -0.05211499, 0.07000764)
+bones/21/rotation = Quaternion(0.09634512, 0.84989, 0.12786397, 0.50205123)
+bones/22/rotation = Quaternion(0.05193575, -0.30777055, 0.009478662, 0.9499948)
+bones/26/rotation = Quaternion(0.2272847, 0.7610715, 0.117701516, 0.5960354)
+bones/27/rotation = Quaternion(-0.021351982, -0.18644273, -0.0031036744, 0.9822289)
+bones/28/rotation = Quaternion(0.02271341, -0.038960613, 0.012461743, 0.9989048)
+bones/31/rotation = Quaternion(0.67775303, 0.5026604, 0.53101236, 0.07751969)
+bones/32/rotation = Quaternion(0.6844338, -0.1803489, -0.23770015, 0.6652242)
+bones/33/rotation = Quaternion(-0.09541304, -0.11887315, -2.9538006e-08, 0.9883145)
+bones/34/rotation = Quaternion(0.32776088, -0.11932436, 0.2825528, 0.8935874)
+bones/35/rotation = Quaternion(-0.28229526, 0.1539195, 0.09484129, 0.9421377)
+bones/36/rotation = Quaternion(-0.04537858, 0.41600594, 0.1804563, 0.89012104)
+bones/39/rotation = Quaternion(-0.033115022, -0.008586655, -0.40904206, 0.9118741)
+bones/40/rotation = Quaternion(-0.0027825283, 0.44091424, -0.04905471, 0.8962034)
+bones/41/rotation = Quaternion(0.08076155, 0.49746227, 0.026641078, 0.86330706)
+bones/44/rotation = Quaternion(0.14055383, 0.56057507, -0.44797394, 0.6821434)
+bones/45/rotation = Quaternion(-0.018073877, 0.39502558, -0.0121094, 0.9184125)
+bones/46/rotation = Quaternion(-0.011519057, 0.4718082, -0.002500605, 0.88162243)
+bones/49/rotation = Quaternion(0.50743556, 0.85000503, 0.045223348, -0.13399811)
+bones/50/rotation = Quaternion(-0.017182853, 0.8730087, 0.12479395, -0.471155)
+bones/51/rotation = Quaternion(0.026335983, 0.62397575, -0.005258152, 0.78098214)
+bones/52/rotation = Quaternion(0.0031745774, 0.18011843, -0.0001617867, 0.98363984)
+bones/55/rotation = Quaternion(0.017045645, -0.797788, -0.15271461, 0.5830283)
+bones/56/rotation = Quaternion(0.023583882, 0.4984039, -0.029828392, 0.8661107)
+bones/57/rotation = Quaternion(0.024966514, 0.2670408, -0.006918624, 0.96333694)
+
+[node name="akm_base" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(133579927, 374746494) index="2" unique_id=1297108620]
+transform = Transform3D(-1, -8.742277e-08, -3.8213705e-15, 0, -4.3711385e-08, 0.9999999, -8.742278e-08, 0.9999999, 4.3711385e-08, 0, 0.11135365, 4.9806566)
+
+[node name="akm_magazine" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="2" unique_id=1350601056]
+transform = Transform3D(1, 0, 0, 0, 1, -1.4210855e-14, 0, 1.4210855e-14, 1, 0, 0.982798, 16.561815)
+
+[node name="akm_trigger" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="3" unique_id=947080203]
+transform = Transform3D(1, 0, 0, 0, 1, -1.4210855e-14, 0, 1.4210855e-14, 1, 5.293956e-23, 4.790164, 5.5018334)
+
+[node name="akm_release" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="4" unique_id=1120176110]
+transform = Transform3D(1, 0, 0, 0, 1, -1.4210855e-14, 0, 1.4210855e-14, 1, 0, 1.7743053, 11.586392)
+
+[node name="akm_ejectionport" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="5" unique_id=593819244]
+transform = Transform3D(1, -4.5e-44, -3.1554436e-30, 0, 1, -1.4210855e-14, 3.1554436e-30, 1.4210855e-14, 1, 1.9721523e-31, 9.246904, 21.88217)
+
+[node name="RemoteTransform3D" type="RemoteTransform3D" parent="model/Sketchfab_model/23b97ca8c70a48a1acd76a6285a128d2_fbx/Object_2/RootNode/akm_base" index="6" unique_id=398398320]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.43186757, 13.208925, 12.955065)
+remote_path = NodePath("../../../../../../../ScopeMount")
+update_scale = false
+
+[node name="AnimationPlayer" parent="model" index="1" unique_id=1553052564]
+libraries/ = SubResource("AnimationLibrary_hta24")
+script = ExtResource("2_8s1la")
+bolt_sound = ExtResource("3_q6xt7")
+equip_sound = ExtResource("8_hpwu8")
+reload1 = ExtResource("4_x8jse")
+reload2 = ExtResource("5_0gusv")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="model/AnimationPlayer" index="0" unique_id=573304849]
+volume_db = 7.5
 
 [editable path="model"]

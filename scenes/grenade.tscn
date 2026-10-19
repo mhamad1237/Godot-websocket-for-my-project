@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://d0kda2im5mlyh"]
+
+[ext_resource type="PackedScene" uid="uid://qy1x48fnt3m" path="res://models/grenade/low-poly_mk2_grenade.glb" id="1_cvyik"]
+[ext_resource type="Script" uid="uid://bsl5w00j6afel" path="res://scripts/grenade.gd" id="1_wxtds"]
+[ext_resource type="PackedScene" uid="uid://c01cfikl2okxf" path="res://scenes/explosion.tscn" id="3_vhiwl"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_g7b7a"]
+radius = 0.06
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vhiwl"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="grenade" type="RigidBody3D" unique_id=367834547]
+mass = 0.4
+continuous_cd = true
+contact_monitor = true
+script = ExtResource("1_wxtds")
+
+[node name="Sketchfab_Scene" parent="." unique_id=110403833 instance=ExtResource("1_cvyik")]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=357105323]
+shape = SubResource("SphereShape3D_g7b7a")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=837937055]
+replication_config = SubResource("SceneReplicationConfig_vhiwl")
+
+[node name="explosion" parent="." unique_id=2108546660 instance=ExtResource("3_vhiwl")]
+
+[editable path="Sketchfab_Scene"]

@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://okx53jajdo0n" path="res://models/makarov pistol/animated_pistol.glb" id="1_d2sya"]
 [ext_resource type="Script" uid="uid://crhfykmat762n" path="res://scripts/makarov_pistol.gd" id="1_dqpsg"]
 [ext_resource type="Script" uid="uid://bdpp2tfxfnt44" path="res://scripts/animation_player_ak47.gd" id="3_4mtm3"]
+[ext_resource type="Animation" uid="uid://byynx1ton6c7n" path="res://models/makarov pistol/grenade_throw.res" id="3_m4pj7"]
+[ext_resource type="Animation" uid="uid://mobicrn21thb" path="res://models/makarov pistol/hide.res" id="4_pg46i"]
 [ext_resource type="AudioStream" uid="uid://8gqm06sm0sev" path="res://sounds/Bolt_action_pistol.mp3" id="4_qtj11"]
 [ext_resource type="AudioStream" uid="uid://cbd5ex6gcscpd" path="res://sounds/Reload_pistol_1.mp3" id="5_m4pj7"]
 [ext_resource type="AudioStream" uid="uid://yudgc12k1f1x" path="res://sounds/Reload2_pistol.mp3" id="6_pg46i"]
@@ -318,6 +320,18 @@ tracks/42/keys = {
 "args": [],
 "method": &"play_equip_sound"
 }]
+}
+tracks/43/type = "value"
+tracks/43/imported = false
+tracks/43/enabled = true
+tracks/43/path = NodePath("Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol:visible")
+tracks/43/interp = 1
+tracks/43/loop_wrap = true
+tracks/43/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="Animation" id="Animation_a8klv"]
@@ -641,6 +655,8 @@ tracks/42/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ef7nl"]
 _data = {
 &"equip": SubResource("Animation_sh7sr"),
+&"grenade_throw": ExtResource("3_m4pj7"),
+&"hide": ExtResource("4_pg46i"),
 &"reload": SubResource("Animation_a8klv")
 }
 
@@ -650,55 +666,59 @@ script = ExtResource("1_dqpsg")
 
 [node name="model" parent="." unique_id=821314639 instance=ExtResource("1_d2sya")]
 
-[node name="Root" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(821314639, 2048556286) index="0" unique_id=1709702024]
-transform = Transform3D(1, 0, 0, 0, 1, 2.0903475e-09, 0, -2.0903475e-09, 1, 0, 16.327316, -8.922533)
+[node name="Root" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(821314639, 1066461517) index="0" unique_id=775895997]
+transform = Transform3D(1, 0, 0, 0, 1, 5.192154e-09, 0, -5.192154e-09, 1, 0, 16.740635, -8.789201)
 
-[node name="Skeleton3D" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5" parent_id_path=PackedInt32Array(821314639, 2011088634) index="0" unique_id=782378836]
-bones/1/rotation = Quaternion(-0.08298224, 0.9703512, 0.22348225, -0.0398516)
-bones/2/rotation = Quaternion(0.3823377, -0.27597713, 0.16809951, 0.86567724)
-bones/3/rotation = Quaternion(4.1026033e-16, 1.4886235e-15, 0.25813764, 0.96610814)
-bones/4/rotation = Quaternion(-0.014734522, 0.055031177, 0.2577184, 0.9645391)
-bones/5/rotation = Quaternion(0.26140448, -0.099810235, 0.023748875, 0.95976126)
-bones/6/rotation = Quaternion(-0.14865308, 0.14363198, 0.060090087, 0.97655594)
-bones/7/rotation = Quaternion(-0.07742036, -0.010962553, -0.00085133157, 0.996938)
-bones/9/rotation = Quaternion(-0.24140684, -0.12816536, 0.5868376, 0.7621798)
-bones/10/rotation = Quaternion(-0.19566302, 0.030498765, 0.0060881604, 0.98017794)
-bones/11/rotation = Quaternion(-0.26374605, 0.019689946, 0.005384978, 0.9643762)
-bones/13/rotation = Quaternion(-0.2979149, -0.16025306, 0.6938993, 0.6356646)
-bones/14/rotation = Quaternion(-0.15826797, 0.03739726, 0.0059987484, 0.98666954)
-bones/15/rotation = Quaternion(-0.2877496, 0.009714552, 0.0029189717, 0.957652)
-bones/18/rotation = Quaternion(-0.18075976, -0.57037795, -0.23337904, 0.76650447)
-bones/19/rotation = Quaternion(-0.2319381, 0.007217537, 0.0017210013, 0.97270226)
-bones/20/rotation = Quaternion(-0.34472755, 0.012544849, 0.0046074158, 0.9386077)
-bones/22/rotation = Quaternion(-0.26808846, -0.53695786, -0.21020958, 0.77176213)
-bones/23/rotation = Quaternion(-0.27691174, -0.020060385, -0.005782386, 0.96066856)
-bones/24/rotation = Quaternion(-0.2522611, 0.0050437073, 0.0013148737, 0.96764517)
-bones/26/rotation = Quaternion(0.13587306, 0.9712625, 0.18988281, 0.046177074)
-bones/27/rotation = Quaternion(0.31323224, 0.13748468, 0.018621223, 0.9394875)
-bones/28/rotation = Quaternion(1.3859351e-15, 1.0572245e-15, -0.04917643, 0.99879014)
-bones/29/rotation = Quaternion(-0.03949624, -0.06620977, -0.04903007, 0.99581754)
-bones/30/rotation = Quaternion(0.25560173, 0.20867334, 0.024778781, 0.943668)
-bones/31/rotation = Quaternion(-0.17537384, -0.17431939, 0.18997678, 0.95013976)
+[node name="Skeleton3D" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5" parent_id_path=PackedInt32Array(821314639, 1210689736) index="0" unique_id=2003302812]
+bones/1/position = Vector3(14.093956, -7.1812115, -44.010044)
+bones/1/rotation = Quaternion(0.039539825, 0.8790535, 0.47492665, 0.012098111)
+bones/2/rotation = Quaternion(0.35080144, -0.2478744, 0.16319706, 0.88817984)
+bones/3/rotation = Quaternion(5.3934987e-16, 1.3598203e-15, 0.24856229, 0.968616)
+bones/4/rotation = Quaternion(-0.055285253, 0.041589823, 0.24796669, 0.96629524)
+bones/5/rotation = Quaternion(0.26140466, -0.09981018, 0.02374879, 0.9597612)
+bones/6/rotation = Quaternion(-0.14865306, 0.14363202, 0.060089998, 0.9765559)
+bones/7/rotation = Quaternion(-0.07742046, -0.010962553, -0.0008513328, 0.996938)
+bones/9/rotation = Quaternion(-0.24140696, -0.12816545, 0.5868376, 0.76217973)
+bones/10/rotation = Quaternion(-0.19566327, 0.030498765, 0.0060881684, 0.9801779)
+bones/11/rotation = Quaternion(-0.26374638, 0.019689942, 0.005384985, 0.9643761)
+bones/13/rotation = Quaternion(-0.29791495, -0.16025312, 0.6938993, 0.6356646)
+bones/14/rotation = Quaternion(-0.1582682, 0.03739726, 0.0059987563, 0.9866695)
+bones/15/rotation = Quaternion(-0.28774977, 0.009714551, 0.0029189724, 0.9576519)
+bones/18/rotation = Quaternion(-0.18075982, -0.57037795, -0.2333791, 0.76650447)
+bones/19/rotation = Quaternion(-0.2319383, 0.0072175367, 0.0017210029, 0.9727022)
+bones/23/rotation = Quaternion(-0.27691182, -0.020060385, -0.0057823877, 0.9606685)
+bones/24/rotation = Quaternion(-0.2522613, 0.0050437073, 0.0013148749, 0.9676451)
+bones/26/position = Vector3(-8.1547575, -3.0718794, -43.23419)
+bones/26/rotation = Quaternion(0.22124714, 0.8848532, 0.40883535, 0.030631037)
+bones/27/rotation = Quaternion(0.38819247, 0.17272219, 0.013382787, 0.9051489)
+bones/28/rotation = Quaternion(1.4387712e-15, 1.0041872e-15, -0.055482835, 0.9984597)
+bones/29/rotation = Quaternion(-0.20439348, -0.094648115, -0.054057054, 0.9728016)
+bones/30/rotation = Quaternion(0.25560173, 0.20867334, 0.02477878, 0.94366795)
+bones/31/rotation = Quaternion(-0.17537384, -0.17431939, 0.18997678, 0.9501398)
 bones/32/rotation = Quaternion(-0.20705414, 0.008444949, 0.068786494, 0.97587186)
-bones/34/rotation = Quaternion(-0.06222842, -0.11117104, -0.70800775, 0.6946177)
-bones/36/rotation = Quaternion(-0.32661933, 0.019981965, 0.054944545, 0.943346)
+bones/34/rotation = Quaternion(-0.060190633, -0.031708024, -0.6602371, 0.7479698)
+bones/35/rotation = Quaternion(-0.022769615, -0.047229413, -0.013183642, 0.9985375)
+bones/36/rotation = Quaternion(-0.045243207, 0.034764253, 0.047006696, 0.9972637)
 
-[node name="pistol" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5" parent_id_path=PackedInt32Array(821314639, 2011088634) index="1" unique_id=386526003]
-transform = Transform3D(0.9999999, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, -12.317542, 25.91273)
+[node name="pistol" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5" parent_id_path=PackedInt32Array(821314639, 1210689736) index="1" unique_id=1896918915]
+transform = Transform3D(0.98311543, 0.16111416, -0.08675281, -0.18077219, 0.7816141, -0.5969929, -0.0283768, 0.6025954, 0.7975421, -1.1568996, -35.863537, 13.406143)
 
-[node name="mag" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="3" unique_id=1768532089]
-transform = Transform3D(1, -1.1102304e-08, 2.2369465e-08, 1.6524961e-08, 0.96576893, -0.25940213, -1.8723789e-08, 0.25940213, 0.96576893, -1.1531334e-08, -0.3793054, 0.40616623)
+[node name="stopper" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="1" unique_id=1385169315]
+transform = Transform3D(1, -3.868146e-18, -3.0185378e-18, 3.4694467e-18, 0.99247575, -0.122441456, 3.4694467e-18, 0.122441456, 0.99247575, 1.260033, 5.5021195, 5.614868)
 
-[node name="shell" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol/mag" index="1" unique_id=1162790409]
-transform = Transform3D(1, 0, 0, 0, 0.9657694, 0.25940222, 0, -0.25940222, 0.9657694, 8.385103e-06, 7.3997045, -0.45483077)
+[node name="mag" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="3" unique_id=2078620694]
+transform = Transform3D(1, -2.7576691e-08, 5.5562865e-08, 4.1045887e-08, 0.96576864, -0.2594021, -4.650749e-08, 0.2594021, 0.96576864, -2.8642347e-08, -0.37931094, 0.4061648)
 
-[node name="hammer" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="4" unique_id=620315347]
-transform = Transform3D(1, 1.6494847e-17, 5.370892e-18, -1.0408329e-17, 0.3228286, 0.94645745, 1.3877794e-17, -0.94645745, 0.3228286, 0, 5.573201, -1.6083064)
+[node name="shell" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol/mag" index="1" unique_id=27005023]
+transform = Transform3D(1, 0, 0, 0, 0.9657694, 0.25940222, 0, -0.25940222, 0.9657694, 8.385103e-06, 7.399704, -0.45483175)
 
-[node name="slide" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="6" unique_id=1449856466]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.853218e-15, 7.341485, 3.8720884)
+[node name="hammer" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="4" unique_id=135079962]
+transform = Transform3D(1, 2.1636497e-18, -4.4037193e-18, 3.469447e-18, 0.32282805, 0.9464576, 3.469447e-18, -0.9464576, 0.32282805, 0, 5.573201, -1.6083064)
 
-[node name="AnimationPlayer" parent="model" index="1" unique_id=1024220336]
+[node name="slide" parent="model/Sketchfab_model/105d2810571c4501ba07ac55c5582245_fbx/Object_2/RootNode/Root/Object_5/pistol" index="6" unique_id=1241342181]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4362024e-15, 7.341485, 3.8720891)
+
+[node name="AnimationPlayer" parent="model" index="1" unique_id=76767837]
 libraries/ = SubResource("AnimationLibrary_ef7nl")
 script = ExtResource("3_4mtm3")
 bolt_sound = ExtResource("4_qtj11")

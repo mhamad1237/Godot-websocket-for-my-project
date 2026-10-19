@@ -19,7 +19,9 @@
 [ext_resource type="Script" uid="uid://d0w1kawcd3oy8" path="res://scripts/crosshair.gd" id="17_7qoim"]
 [ext_resource type="Script" uid="uid://dewecitswqwx7" path="res://scripts/aim.gd" id="18_s5gem"]
 [ext_resource type="Texture2D" uid="uid://bhfxlruf1lwof" path="res://models/textures/icon_crosshair.png" id="19_h0mma"]
+[ext_resource type="Script" uid="uid://ccvbpd7jvwumf" path="res://scripts/grenade_button.gd" id="20_byp8s"]
 [ext_resource type="Script" uid="uid://bxh4ngfdgcy1a" path="res://addons/godotx_health_bar/runtime/godotx_health_bar_control.gd" id="20_kc8m0"]
+[ext_resource type="Texture2D" uid="uid://by08pfh88wtll" path="res://models/textures/grenade.png" id="21_qm8nq"]
 [ext_resource type="Script" uid="uid://di40il8m7meey" path="res://addons/godotx_health_bar/runtime/godotx_health_bar_style.gd" id="21_xlgkt"]
 [ext_resource type="Script" uid="uid://ej2416acryl2" path="res://scripts/HealthBinder.gd" id="22_byp8s"]
 
@@ -327,11 +329,47 @@ grow_vertical = 2
 texture = ExtResource("19_h0mma")
 metadata/_edit_use_anchors_ = true
 
+[node name="grenade" type="Control" parent="gameplay" unique_id=88813273]
+layout_mode = 1
+anchor_left = 0.87600005
+anchor_top = 0.272
+anchor_right = 0.87600005
+anchor_bottom = 0.272
+offset_left = -4.2800293
+offset_top = 0.1599884
+offset_right = 35.71997
+offset_bottom = 40.15999
+script = ExtResource("20_byp8s")
+
+[node name="TextureRect2" type="TextureRect" parent="gameplay/grenade" unique_id=797299886]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.075
+anchor_top = 0.4
+anchor_right = -0.075
+anchor_bottom = 0.45
+offset_right = 129.0
+offset_bottom = 127.0
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="gameplay/grenade" unique_id=1171296974]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 40.0
+offset_right = 98.0
+offset_bottom = 124.0
+mouse_filter = 2
+texture = ExtResource("21_qm8nq")
+expand_mode = 1
+
 [node name="GodotxHealthBarControl" type="Control" parent="gameplay" unique_id=934796149 groups=["hud"]]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
+anchor_left = 0.42265624
+anchor_top = 0.9097222
+anchor_right = 0.42265624
+anchor_bottom = 0.9097222
 offset_left = -179.0
 offset_right = 179.0
 offset_bottom = 65.0
@@ -339,6 +377,7 @@ grow_horizontal = 2
 script = ExtResource("20_kc8m0")
 style = SubResource("Resource_g7b7a")
 metadata/_custom_type_script = "uid://bxh4ngfdgcy1a"
+metadata/_edit_use_anchors_ = true
 
 [node name="Node" type="Node" parent="gameplay/GodotxHealthBarControl" unique_id=1372266517]
 script = ExtResource("22_byp8s")

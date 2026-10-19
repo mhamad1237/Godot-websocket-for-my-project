@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dyk5f6hjd3nxy" path="res://scenes/touch_controls.tscn" id="3_tbgi4"]
 [ext_resource type="Environment" uid="uid://bgpuyk1smvccw" path="res://new_environment.tres" id="4_lbhrr"]
 [ext_resource type="PackedScene" uid="uid://lv4l0frtpxgt" path="res://scenes/sandyards.tscn" id="4_tbgi4"]
+[ext_resource type="Script" uid="uid://d3dntxnlra6x" path="res://scripts/grenade_spawner.gd" id="5_iywne"]
 
 [node name="game" type="Node3D" unique_id=194710337 node_paths=PackedStringArray("controls_root")]
 script = ExtResource("1_lnu2h")
@@ -29,5 +30,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -11.9224825, 23.421968)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=17942443]
 spawn_path = NodePath("../Players")
+
+[node name="Grenades" type="Node3D" parent="." unique_id=164288152]
+
+[node name="GrenadeSpawner" type="MultiplayerSpawner" parent="Grenades" unique_id=374534189]
+spawn_path = NodePath("..")
+script = ExtResource("5_iywne")
 
 [editable path="touch_controls"]

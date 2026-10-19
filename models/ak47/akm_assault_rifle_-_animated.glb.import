@@ -1479,14 +1479,14 @@ _subresources={
 "slice_29/save_to_file/keep_custom_tracks": false,
 "slice_29/save_to_file/path": "",
 "slice_29/start_frame": 0,
-"slice_3/end_frame": 0,
+"slice_3/end_frame": 164,
 "slice_3/loop_mode": 0,
-"slice_3/name": "",
-"slice_3/save_to_file/enabled": false,
-"slice_3/save_to_file/fallback_path": "",
+"slice_3/name": "hide",
+"slice_3/save_to_file/enabled": true,
+"slice_3/save_to_file/fallback_path": "res://models/ak47/hide.res",
 "slice_3/save_to_file/keep_custom_tracks": false,
-"slice_3/save_to_file/path": "",
-"slice_3/start_frame": 0,
+"slice_3/save_to_file/path": "uid://fuw232b75qo4",
+"slice_3/start_frame": 153,
 "slice_30/end_frame": 0,
 "slice_30/loop_mode": 0,
 "slice_30/name": "",
@@ -2095,7 +2095,7 @@ _subresources={
 "slice_99/save_to_file/keep_custom_tracks": false,
 "slice_99/save_to_file/path": "",
 "slice_99/start_frame": 0,
-"slices/amount": 2
+"slices/amount": 3
 }
 },
 "nodes": {

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dvnq20ld47x7t"
-path="res://.godot/imported/pistol idle.fbx-598fb9999e13dd24428d3a29b709e381.scn"
+uid="uid://wdf5tgregngc"
+path="res://.godot/imported/Toss Grenade.fbx-dfc7f3262f01fa6593b2c551f4e096c3.scn"
 
 [deps]
 
-source_file="res://models/Pro Rifle Pack/pistol idle.fbx"
-dest_files=["res://.godot/imported/pistol idle.fbx-598fb9999e13dd24428d3a29b709e381.scn"]
+source_file="res://models/Pro Rifle Pack/Toss Grenade.fbx"
+dest_files=["res://.godot/imported/Toss Grenade.fbx-dfc7f3262f01fa6593b2c551f4e096c3.scn"]
 
 [params]
 
