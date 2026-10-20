@@ -16,7 +16,7 @@ var _connecting := false
 var _dots_time := 0.0
 var _play_text := ""
 
-func _ready() -> void:
+func _ready():
 	_play_text = play_button.text
 	play_button.pressed.connect(_on_play_online_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
@@ -109,6 +109,7 @@ func _refresh_player_list() -> void:
 
 
 func _on_start_pressed() -> void:
+	
 	NetworkManager.start_game()
 
 

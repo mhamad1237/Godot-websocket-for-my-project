@@ -603,7 +603,7 @@ func _get_ads_anim() -> String:
 
 
 func enter_ads() -> void:
-	if is_ads or not animation_player or not current_weapon_data or  player.is_airborne or is_reloading or wall_check_ray.is_colliding():
+	if is_ads or not animation_player or not current_weapon_data or  player.is_airborne or is_reloading or wall_check_ray.is_colliding() or current_weapon.weapon_anim_player.is_playing():
 		return
 	if player.is_sprinting:
 		Input.action_release("sprint")

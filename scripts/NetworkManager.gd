@@ -347,6 +347,7 @@ func proceed_to_game() -> void:
 		get_tree().change_scene_to_packed(game_scene_res)
 	else:
 		get_tree().change_scene_to_file(GAME_SCENE)
+		Explosion.warm(self,4)
 	# Safety net so the screen can never get stuck
 	get_tree().create_timer(15.0).timeout.connect(_clear_overlay)
 
@@ -358,7 +359,6 @@ func notify_local_player_ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
-
 	if not is_instance_valid(_loading_layer):
 		return
 	var tw := create_tween()

@@ -1,7 +1,7 @@
 extends RigidBody3D
 
 const DAMAGE := 120.0
-const RADIUS := 6.0
+const RADIUS := 8
 const MIN_DAMAGE_FRACTION := 0.1
 
 var fuse := 3.5
@@ -45,10 +45,12 @@ func _explode() -> void:
 		p._server_apply_damage(dmg, owner_id)
 	_explode_fx.rpc(center)
 	freeze = true
-	await get_tree().create_timer(0.8).timeout   # let the effect play on every peer
+	$model.hide()
+	await get_tree().create_timer(2.21).timeout   # let the effect play on every peer
 	queue_free()
 
 
 @rpc("authority", "call_local", "reliable")
-func _explode_fx(_pos: Vector3) -> void:
-	$explosion.setup()
+func _explode_fx(pos: Vector3) -> void:
+	Explosion.spawn(get_tree().current_scene, pos)
+	$explosion_sound.play()

@@ -3,6 +3,11 @@
 [ext_resource type="PackedScene" uid="uid://qy1x48fnt3m" path="res://models/grenade/low-poly_mk2_grenade.glb" id="1_cvyik"]
 [ext_resource type="Script" uid="uid://bsl5w00j6afel" path="res://scripts/grenade.gd" id="1_wxtds"]
 [ext_resource type="PackedScene" uid="uid://c01cfikl2okxf" path="res://scenes/explosion.tscn" id="3_vhiwl"]
+[ext_resource type="AudioStream" uid="uid://qn0u6wm3x5rc" path="res://sounds/grenade-explosion-1.mp3" id="4_76ndk"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vhiwl"]
+friction = 0.6
+bounce = 0.45
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_g7b7a"]
 radius = 0.06
@@ -17,11 +22,14 @@ properties/1/replication_mode = 1
 
 [node name="grenade" type="RigidBody3D" unique_id=367834547]
 mass = 0.4
+physics_material_override = SubResource("PhysicsMaterial_vhiwl")
 continuous_cd = true
 contact_monitor = true
+linear_damp = 0.1
+angular_damp = 1.5
 script = ExtResource("1_wxtds")
 
-[node name="Sketchfab_Scene" parent="." unique_id=110403833 instance=ExtResource("1_cvyik")]
+[node name="model" parent="." unique_id=110403833 instance=ExtResource("1_cvyik")]
 transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=357105323]
@@ -32,4 +40,8 @@ replication_config = SubResource("SceneReplicationConfig_vhiwl")
 
 [node name="explosion" parent="." unique_id=2108546660 instance=ExtResource("3_vhiwl")]
 
-[editable path="Sketchfab_Scene"]
+[node name="explosion_sound" type="AudioStreamPlayer3D" parent="." unique_id=748544919]
+stream = ExtResource("4_76ndk")
+unit_size = 50.0
+
+[editable path="model"]
