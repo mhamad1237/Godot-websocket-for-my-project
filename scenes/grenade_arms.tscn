@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://dt2ogsgc4lej7"]
 
 [ext_resource type="PackedScene" uid="uid://c4r8t6e6250x3" path="res://models/grenade throw/fps_arms_throwing.glb" id="1_ero1c"]
-[ext_resource type="Animation" uid="uid://bbcp3ilq4nvt8" path="res://animations/arms/grenade_throw.res" id="2_kmudp"]
+[ext_resource type="Animation" uid="uid://ddfdm4mfumxwf" path="res://animations/arms/grenade_throw.res" id="2_kmudp"]
+[ext_resource type="PackedScene" uid="uid://qy1x48fnt3m" path="res://models/grenade/low-poly_mk2_grenade.glb" id="3_n8hyf"]
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_n8hyf"]
 _data = {
@@ -13,13 +14,13 @@ transform = Transform3D(-0.01, 0, -8.7422775e-10, 0, 0.01, 0, 8.7422775e-10, 0, 
 
 [node name="model" parent="." unique_id=332851641 instance=ExtResource("1_ero1c")]
 
-[node name="L_wrist_Goal" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(332851641, 1421994613) index="0" unique_id=1500364426]
+[node name="L_wrist_Goal" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(332851641, 471685682) index="0" unique_id=382457999]
 transform = Transform3D(-0.5349626, 0.70336026, 0.46808052, 0.8434831, 0.47641936, 0.2481144, -0.048488807, 0.5275499, -0.8481391, 29.152405, -15.803722, -11.406351)
 
-[node name="R_wrist_Goal" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(332851641, 1421994613) index="1" unique_id=1888176770]
-transform = Transform3D(-0.7276169, -0.47501516, -0.49490815, -0.57768005, 0.813373, 0.068629436, 0.36994496, 0.3358346, -0.8662307, -13.926631, -8.52825, -6.059014)
+[node name="R_wrist_Goal" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode" parent_id_path=PackedInt32Array(332851641, 471685682) index="1" unique_id=1052348403]
+transform = Transform3D(-0.7276169, -0.47501513, -0.49490815, -0.57768005, 0.81337297, 0.068629436, 0.36994496, 0.33583456, -0.8662307, -13.926631, -8.52825, -6.059014)
 
-[node name="Skeleton3D" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode/Root/Object_9" parent_id_path=PackedInt32Array(332851641, 416615266) index="0" unique_id=632837462]
+[node name="Skeleton3D" parent="model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode/Root/Object_9" parent_id_path=PackedInt32Array(332851641, 310553580) index="0" unique_id=2021553701]
 bones/2/rotation = Quaternion(-0.052734565, 0.548839, 0.8158172, -0.17446265)
 bones/3/rotation = Quaternion(0.7778045, -0.13856947, -0.05018923, 0.6109827)
 bones/4/rotation = Quaternion(-0.11718452, -0.16692914, 0.52153444, 0.8284953)
@@ -51,7 +52,19 @@ bones/46/rotation = Quaternion(-0.06344703, -0.027081246, -0.7494836, 0.65841895
 bones/47/rotation = Quaternion(-0.5384955, -0.0018985096, -0.044826545, 0.8414331)
 bones/48/rotation = Quaternion(-0.44015893, -0.030481996, -0.047303505, 0.89615476)
 
-[node name="AnimationPlayer" parent="model" index="1" unique_id=1399989754]
+[node name="AnimationPlayer" parent="model" index="1" unique_id=1422012068]
 libraries/ = SubResource("AnimationLibrary_n8hyf")
 
+[node name="GrenadeAttachment" type="BoneAttachment3D" parent="." unique_id=1274305953]
+transform = Transform3D(-0.7276169, -0.47501537, -0.49490827, -0.57768, 0.8133731, 0.06862933, 0.36994523, 0.33583444, -0.866231, -13.923504, -8.528328, -6.054215)
+bone_name = "R_wrist_027"
+bone_idx = 28
+use_external_skeleton = true
+external_skeleton = NodePath("../model/Sketchfab_model/2a440e79117e44b0aa2f94f730c95d41_fbx/Object_2/RootNode/Root/Object_9/Skeleton3D")
+
+[node name="Grenade" parent="GrenadeAttachment" unique_id=110403833 instance=ExtResource("3_n8hyf")]
+transform = Transform3D(1.2908158, -1.7710214, -1.2030299, 2.1191206, 1.2570884, 0.42315078, 0.3051626, -1.2382305, 2.1502707, 0.74858093, -2.0937445, -11.394199)
+visible = false
+
 [editable path="model"]
+[editable path="GrenadeAttachment/Grenade"]

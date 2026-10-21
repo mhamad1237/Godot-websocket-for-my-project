@@ -6,6 +6,8 @@ var crosshair: Control
 var last_holder_bob_offset: Vector3 = Vector3.ZERO
 var tp_rig : Node3D = null
 @onready var grenade_arms: Node3D = get_node_or_null("grenade_arms")
+@onready var hand_grenade: Node3D = $grenade_arms/GrenadeAttachment/Grenade
+@onready var grenade_attachment: Node3D = $grenade_arms/GrenadeAttachment
 
 var _gren_ap: AnimationPlayer = null
 var _gren_anim := ""
@@ -264,6 +266,8 @@ func start_grenade_fp() -> void:
 	_gren_ap.play(_gren_anim)
 
 
+
+
 func hold_grenade_fp(at: float) -> void:
 	if _gren_ap == null:
 		return
@@ -323,6 +327,13 @@ func hide_grenade_arms() -> void:
 		grenade_arms.hide()
 	if bob_pivot:
 		bob_pivot.show()
+
+
+## Where the real grenade RigidBody3D should spawn.
+func get_grenade_spawn_position() -> Vector3:
+	if grenade_attachment:
+		return grenade_attachment.global_position
+	return player.camera.global_position
 
 func _physics_process(_delta: float) -> void:
 	process_weapon_input()

@@ -5,6 +5,8 @@ const WALK_SPEED := 3.0
 const SPRINT_SPEED := 6.0
 const CROUCH_SPEED := 1.5
 var _idle_frames : int = 0
+var target_position: Vector3 = Vector3.ZERO   # <--- Add this variable near the top with other vars
+
 const GRENADE_EXPLOSION = preload(
 	"res://scenes/explosion.tscn"
 )
@@ -127,7 +129,7 @@ var active_recoil_decay_speed: float = 6.0
 var sync_falling := false
 
 var _state_sync_timer := 0.0
-const STATE_SYNC_INTERVAL := 0.0
+const STATE_SYNC_INTERVAL := 0.033
 @onready var loadout_button: Button = $RespawnContainer/LoadoutButton
 var _loadout_layer: CanvasLayer = null
 @onready var respawn_container: Control = $RespawnContainer
@@ -160,6 +162,7 @@ func _ready() -> void:
 	respawn_label.hide()   # hidden on every peer, including remote copies
 	floor_snap_length = MAX_STEP_HEIGHT
 	if is_multiplayer_authority():
+		target_position = global_position
 		if NetworkManager.offline:
 			_add_debug_kill_button()
 		loadout_button.pressed.connect(_on_loadout_pressed)
@@ -172,8 +175,8 @@ func _ready() -> void:
 		health = max_health
 		get_tree().call_group("hud", "bind_player", self)
 		call_deferred("_init_walking_animation")
-
 	else:
+		target_position = global_position
 		camera.current = false
 		weapon_holder.hide()
 		set_physics_process(false)
@@ -204,9 +207,13 @@ func _add_debug_kill_button() -> void:
 		if not is_dead:
 			_server_apply_damage(MAX_DAMAGE_PER_HIT, 0))
 	layer.add_child(b)
+
 func _process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		_remote_anim(delta)
+		
+		# --- Smoothly interpolate remote player position ---
+		global_position = global_position.lerp(target_position, delta * 20.0)
 		return
 	_update_footsteps()
 
@@ -220,7 +227,6 @@ func _process(delta: float) -> void:
 		$Wind.volume_db = move_toward($Wind.volume_db, -40.0, fade_speed * delta)
 	# Send this player's animation state to the other peers.
 	_state_sync_timer += delta
-
 	if _state_sync_timer >= STATE_SYNC_INTERVAL:
 		_state_sync_timer = 0.0
 
@@ -231,8 +237,10 @@ func _process(delta: float) -> void:
 				is_crouching,
 				is_airborne or is_landing,
 				is_airborne and velocity.y < 0.0,
-				current_collision_mode
+				current_collision_mode,
+				global_position   # <--- Pass global_position here
 			)
+
 
 	landing_offset_y = move_toward(
 		landing_offset_y,
@@ -284,17 +292,19 @@ func receive_remote_anim_state(
 	crouching: bool,
 	airborne: bool,
 	falling: bool,
-	collision_mode: String
+	collision_mode: String,
+	pos: Vector3   # <--- Added parameter
 ) -> void:
 	sync_move = move
 	sync_sprinting = sprinting
 	sync_crouching = crouching
 	sync_airborne = airborne
 	sync_falling = falling
+	target_position = pos   # <--- Update interpolation target
 
-	# Also acts as a fallback for the initial collision state.
 	if collision_mode != current_collision_mode:
 		set_collision(collision_mode)
+
 func _remote_anim(delta: float) -> void:
 	var loco: AnimationNodeStateMachinePlayback = _loco_playback()
 	var jump: AnimationNodeStateMachinePlayback = anim_tree.get("parameters/Jumping/playback")
@@ -1290,19 +1300,16 @@ func _try_throw_grenade() -> void:
 		_throwing = false
 		tps_rig.skeletonIK.start()
 
-
 func _on_grenade_release(fuse_left: float) -> void:
 	var t := camera.global_transform
 	var dir := -t.basis.z
-	var origin := t.origin + dir * 0.5
+	var origin = weapon_holder.get_grenade_spawn_position()
 	var vel := dir * GRENADE_THROW_SPEED + Vector3.UP * 2.0 + velocity * 0.5
 	_launch_grenade(origin, vel, fuse_left)
 
 
 func _on_grenade_cooked_off() -> void:
 	_launch_grenade(global_position + Vector3.UP, Vector3.ZERO, 0.0)
-
-
 func _launch_grenade(origin: Vector3, vel: Vector3, fuse_left: float) -> void:
 	if multiplayer.is_server():
 		_server_spawn_grenade(origin, vel, fuse_left)
