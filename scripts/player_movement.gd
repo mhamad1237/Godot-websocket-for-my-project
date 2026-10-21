@@ -6,7 +6,10 @@ const SPRINT_SPEED := 6.0
 const CROUCH_SPEED := 1.5
 var _idle_frames : int = 0
 var target_position: Vector3 = Vector3.ZERO   # <--- Add this variable near the top with other vars
+const REMOTE_INTERPOLATION_DELAY := 0.10
+const MAX_REMOTE_SNAPSHOTS := 12
 
+var _remote_position_snapshots: Array[Dictionary] = []
 const GRENADE_EXPLOSION = preload(
 	"res://scenes/explosion.tscn"
 )
@@ -211,9 +214,7 @@ func _add_debug_kill_button() -> void:
 func _process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		_remote_anim(delta)
-		
-		# --- Smoothly interpolate remote player position ---
-		global_position = global_position.lerp(target_position, delta * 20.0)
+		_update_remote_position()
 		return
 	_update_footsteps()
 
@@ -293,14 +294,25 @@ func receive_remote_anim_state(
 	airborne: bool,
 	falling: bool,
 	collision_mode: String,
-	pos: Vector3   # <--- Added parameter
+	pos: Vector3
 ) -> void:
 	sync_move = move
 	sync_sprinting = sprinting
 	sync_crouching = crouching
 	sync_airborne = airborne
 	sync_falling = falling
-	target_position = pos   # <--- Update interpolation target
+	target_position = pos
+
+	# Timestamp the received snapshot using this device's clock.
+	var now := float(Time.get_ticks_usec()) / 1_000_000.0
+
+	_remote_position_snapshots.append({
+		"time": now,
+		"position": pos
+	})
+
+	while _remote_position_snapshots.size() > MAX_REMOTE_SNAPSHOTS:
+		_remote_position_snapshots.pop_front()
 
 	if collision_mode != current_collision_mode:
 		set_collision(collision_mode)
