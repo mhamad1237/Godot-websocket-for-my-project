@@ -5,31 +5,21 @@
 [ext_resource type="PackedScene" uid="uid://lip05tgnr6s7" path="res://scenes/2x_scope_reticle.tscn" id="2_k4377"]
 [ext_resource type="Shader" uid="uid://cmget032sc0r8" path="res://scripts/scope.gdshader" id="3_2qmqr"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_m63kh"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_fblp5"]
 viewport_path = NodePath("display/reticle_viewport")
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_40vc6"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_8ev7u"]
 viewport_path = NodePath("display/camera_viewport")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gyc6d"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("3_2qmqr")
-shader_parameter/scope_brightness = 0.6999999843536
-shader_parameter/reticle_texture = SubResource("ViewportTexture_m63kh")
-shader_parameter/scope_texture = SubResource("ViewportTexture_40vc6")
+shader_parameter/reticle_texture = SubResource("ViewportTexture_fblp5")
+shader_parameter/scope_texture = SubResource("ViewportTexture_8ev7u")
 shader_parameter/scope_radius = 0.015
-shader_parameter/reticle_depth = 0.58
-shader_parameter/parallax_factor = 0.1
-shader_parameter/view_edge_fade_factor = 0.05
-shader_parameter/reticle_reference_distance = 0.15
-shader_parameter/reticle_scale_strength = 0.5
-shader_parameter/eyebox_position = 0.055
-shader_parameter/eyebox_tolerance = 0.005
-shader_parameter/eyebox_fade_distance = 0.05
-shader_parameter/shadow_inner_radius = 1.0
-shader_parameter/shadow_fade_factor = 0.2
-shader_parameter/shadow_movement_factor = 1.0
+shader_parameter/scope_enabled = false
+shader_parameter/scope_brightness = 0.6999999843536
 
 [sub_resource type="QuadMesh" id="QuadMesh_g7b7a"]
 material = SubResource("ShaderMaterial_gyc6d")
@@ -55,7 +45,7 @@ texture_mipmap_bias = 1.0
 
 [node name="camera_viewport" type="SubViewport" parent="display" unique_id=1536357411]
 use_occlusion_culling = true
-mesh_lod_threshold = 0.8
+mesh_lod_threshold = 8.0
 scaling_3d_mode = 5
 texture_mipmap_bias = 1.0
 positional_shadow_atlas_size = 1024

@@ -1,14 +1,15 @@
 # ============================================================
-# NetworkManager.gd  (dedicated server + WebSocket version)
+# NetworkManager.gd (Tube + WebRTC peer-to-peer version)
 # ============================================================
-# - The SERVER is a headless Godot instance (peer id 1). It is NOT a player.
-# - Every player is a client that joins over wss://.
-# - The first player in the room (lowest id) is the "leader" and can press Start.
+# - One player creates a Tube session and becomes server peer ID 1.
+# - Other players join using the session ID / room code.
+# - The host is also a real player; there is no dedicated server.
+# - Uses Godot high-level multiplayer RPCs, MultiplayerSpawner and
+#   the same roster / game-loading flow as the previous manager.
 extends Node
+
 signal preload_progress(progress: float)
 signal preload_finished
-var offline := false
-
 signal connection_succeeded
 signal connection_failed
 signal server_closed
@@ -18,26 +19,39 @@ signal roster_changed
 signal game_started
 signal preload_failed
 signal show_loading_overlay
-signal debug_status(text: String)   # lobby shows these in its status label
+signal debug_status(text: String)
+signal room_created(room_code: String)
 
-# ---- Edit these for your project ----
-const SERVER_URL := "wss://zj2a51j4thjj-production-tzymyhgd.europe-west1.suga.run"   # no port, Suga uses 443
-const DEFAULT_PORT := 9080                         # server listens here (or $PORT)
+var offline := false
+
+# TubeContext resource previously created in the project.
+# Change this if your .tres file lives somewhere else.
+const TUBE_CONTEXT_PATH := "res://tube_context.tres"
+
 const MAX_PLAYERS := 8
 const GAME_VERSION := "0.1"
 const LOADING_SCENE := "res://scenes/loading.tscn"
 const LOBBY_SCENE := "res://scenes/lobby.tscn"
 const GAME_SCENE := "res://scenes/game.tscn"
 const PLAYER_SCENE_PATH := "res://scenes/player.tscn"
-const SERVER_SCENE := "res://scenes/server_boot.tscn"  # empty Node scene
-# -------------------------------------
 
-## peer_id -> {"name": String}. Same on every peer (server broadcasts it).
-## The dedicated server (id 1) is never in this dictionary.
+## peer_id -> {"name": String}. In a Tube room the host (peer ID 1)
+## is a player and is included in this dictionary.
 var players: Dictionary = {}
 var local_name := "Player"
+var room_code := ""
 var in_game := false
+
+# Kept for compatibility with existing scripts that check this variable.
+# Tube/WebRTC sessions do not use a dedicated server.
 var dedicated := false
+
+var _tube_client: TubeClient
+var _session_active := false
+var _pending_action := "" # "create", "join", or ""
+var _client_registration_started := false
+var _suppress_session_left := false
+var _multiplayer_signals_connected := false
 
 var _players_root: Node
 var _spawner: MultiplayerSpawner
@@ -49,114 +63,184 @@ var game_scene_res: PackedScene = null
 var player_scene_res: PackedScene = null
 var is_preloading := false
 var preload_done := false
-var loading_overlay: Control = null   # set by the lobby
+var loading_overlay: Control = null
 var _loading_layer: CanvasLayer = null
-
-
 var _last_conn_status := -1
 
 
-## Clients: shown on screen via debug_status. Server: goes to the Suga logs.
-func _dbg(text: String) -> void:
-	if dedicated:
-		print("[NET] ", text)
-	else:
-		debug_status.emit(text)
+func _ready() -> void:
+	# TubeClient must set the SceneTree MultiplayerAPI before we connect to
+	# MultiplayerAPI signals. Otherwise these callbacks may be connected to
+	# the default API instead of Tube's WebRTC API.
+	_ensure_tube_client()
 
 
 func _process(_delta: float) -> void:
+	if offline or dedicated:
+		return
 	var peer := multiplayer.multiplayer_peer
-	if peer == null or dedicated:
+	if peer == null:
 		return
 	var st := peer.get_connection_status()
 	if st != _last_conn_status:
 		_last_conn_status = st
-		_dbg("Status: " + ["DISCONNECTED", "CONNECTING", "CONNECTED"][st])
+		var labels := ["DISCONNECTED", "CONNECTING", "CONNECTED"]
+		if st >= 0 and st < labels.size():
+			_dbg("WebRTC status: " + labels[st])
+		else:
+			_dbg("WebRTC status: " + str(st))
 
 
-func _ready() -> void:
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
-	multiplayer.connected_to_server.connect(_on_connected_to_server)
-	multiplayer.connection_failed.connect(_on_connection_failed)
-	multiplayer.server_disconnected.connect(_on_server_disconnected)
-
-	# Started with:  godot --headless ... -- --server
-	if OS.has_feature("dedicated_server") or "--server" in OS.get_cmdline_user_args():
-		start_dedicated_server()
+func _dbg(message: String) -> void:
+	if dedicated:
+		print("[NET] ", message)
+	else:
+		debug_status.emit(message)
 
 
 # ============================================================
-# Public API
+# Tube setup
+# ============================================================
+func _ensure_tube_client() -> bool:
+	if is_instance_valid(_tube_client):
+		return true
+
+	if not ResourceLoader.exists(TUBE_CONTEXT_PATH):
+		var message := "TubeContext not found at " + TUBE_CONTEXT_PATH
+		push_error("NetworkManager: " + message)
+		_dbg(message + ". Check TUBE_CONTEXT_PATH.")
+		return false
+
+	var context_resource := load(TUBE_CONTEXT_PATH) as TubeContext
+	if context_resource == null:
+		push_error("NetworkManager: failed to load TubeContext: " + TUBE_CONTEXT_PATH)
+		_dbg("Failed to load TubeContext resource")
+		return false
+
+	_tube_client = TubeClient.new()
+	_tube_client.name = "TubeClient"
+	_tube_client.context = context_resource
+	# Default Tube behavior overrides the multiplayer API for the whole tree.
+	# Set this before add_child(), because TubeClient configures it in _ready().
+	_tube_client.multiplayer_root_node = get_tree().root
+
+	_tube_client.session_created.connect(_on_tube_session_created)
+	_tube_client.session_joined.connect(_on_tube_session_joined)
+	_tube_client.session_left.connect(_on_tube_session_left)
+	_tube_client.error_raised.connect(_on_tube_error_raised)
+
+	add_child(_tube_client)
+
+	# Connect after TubeClient._ready() has installed its MultiplayerAPI.
+	if not _multiplayer_signals_connected:
+		multiplayer.peer_connected.connect(_on_peer_connected)
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+		multiplayer.connected_to_server.connect(_on_connected_to_server)
+		multiplayer.connection_failed.connect(_on_connection_failed)
+		multiplayer.server_disconnected.connect(_on_server_disconnected)
+		_multiplayer_signals_connected = true
+
+	return true
+
+
+# ============================================================
+# Public API used by the lobby
 # ============================================================
 func is_online() -> bool:
-	return multiplayer.multiplayer_peer is WebSocketMultiplayerPeer
+	return _session_active and not offline and multiplayer.multiplayer_peer != null
 
 
 func my_id() -> int:
-	return multiplayer.get_unique_id() if is_online() else 1
+	if is_online() or offline:
+		return multiplayer.get_unique_id()
+	return 1
 
 
-## Id of the player allowed to press Start (lowest id in the room), or -1.
+## The lowest peer ID is the room leader. Tube's host is peer ID 1.
 func leader_id() -> int:
-	var ids := players.keys()
-	if ids.is_empty():
+	if players.is_empty():
 		return -1
-	return ids.min()
+	var ids: Array = players.keys()
+	ids.sort()
+	return int(ids[0])
 
 
 func is_leader() -> bool:
-	return is_online() and not dedicated and my_id() == leader_id()
+	return is_online() and my_id() == leader_id()
 
 
-## Kept so the lobby's start-button check still works.
-## If other scripts use is_host() to mean "has authority", use multiplayer.is_server() there.
+## Kept so the current lobby can continue checking NetworkManager.is_host().
 func is_host() -> bool:
 	return is_leader()
 
 
-## SERVER ONLY. Runs on the headless instance.
+## Compatibility stub in case an old server_boot scene still calls this.
+## The Tube/WebRTC version does not start or require a dedicated server.
 func start_dedicated_server() -> Error:
-	disconnect_game()
-	var env_port := OS.get_environment("PORT")
-	var port := int(env_port) if env_port != "" else DEFAULT_PORT
-	var peer := WebSocketMultiplayerPeer.new()
-	var err := peer.create_server(port)   # plain ws; Suga's gateway adds TLS
-	if err != OK:
-		push_error("NetworkManager: create_server failed (%s)" % error_string(err))
-		return err
-	multiplayer.multiplayer_peer = peer
-	dedicated = true
-	players.clear()
-	Engine.max_fps = 60   # don't burn CPU on a headless server
-	print("Dedicated server listening on port ", port)
-	return OK
+	push_warning("NetworkManager: dedicated servers are disabled in the Tube/WebRTC version.")
+	return ERR_UNAVAILABLE
 
 
-## CLIENT. Connect to the online server.
-func join_online(player_name: String, url: String = SERVER_URL) -> Error:
+## Backwards-compatible with the existing HostButton code:
+## NetworkManager.join_online(name_edit.text) now creates a WebRTC room.
+func join_online(player_name: String, _unused_url: String = "") -> Error:
+	return create_room(player_name)
+
+
+func create_room(player_name: String) -> Error:
+	if not _ensure_tube_client():
+		return ERR_CANT_OPEN
+
 	disconnect_game()
 	local_name = _clean_name(player_name)
+	_pending_action = "create"
+	_session_active = false
+	_client_registration_started = false
+	room_code = ""
 	_last_conn_status = -1
-	_dbg("Connecting to %s as %s" % [url, local_name])
-	var peer := WebSocketMultiplayerPeer.new()
-	var err := peer.create_client(url)
-	_dbg("create_client: " + error_string(err))
-	if err != OK:
-		push_warning("NetworkManager: create_client failed (%s)" % error_string(err))
-		return err
-	multiplayer.multiplayer_peer = peer
-	_dbg("Searching for server...")
+	_dbg("Creating WebRTC room as " + local_name + "...")
+
+	_tube_client.create_session()
 	return OK
 
 
-## Closes the connection and resets all state. Safe to call anytime.
+## Used by the lobby's ConnectButton: join_room(room_code, player_name).
+func join_room(session_id: String, player_name: String) -> Error:
+	var cleaned_session_id := session_id.strip_edges()
+	if cleaned_session_id.is_empty():
+		_dbg("Enter a room code first")
+		return ERR_INVALID_PARAMETER
+	if not _ensure_tube_client():
+		return ERR_CANT_OPEN
+
+	disconnect_game()
+	local_name = _clean_name(player_name)
+	_pending_action = "join"
+	_session_active = false
+	_client_registration_started = false
+	room_code = cleaned_session_id
+	_last_conn_status = -1
+	_dbg("Joining WebRTC room " + cleaned_session_id + " as " + local_name + "...")
+
+	_tube_client.join_session(cleaned_session_id)
+	return OK
+
+
+## Closes the active/pending Tube session and resets game/network state.
 func disconnect_game() -> void:
+	var needs_leave := _session_active or not _pending_action.is_empty()
+	if needs_leave and is_instance_valid(_tube_client):
+		_suppress_session_left = true
+		_tube_client.leave_session()
+
+	_clear_local_network_state()
+
+
+func _clear_local_network_state() -> void:
 	offline = false
 	Global.clear_local_refs()
-	if multiplayer.multiplayer_peer is WebSocketMultiplayerPeer:
-		multiplayer.multiplayer_peer.close()
-	multiplayer.multiplayer_peer = null
+	if multiplayer.multiplayer_peer != null:
+		multiplayer.multiplayer_peer = null
 	players.clear()
 	_loaded_peers.clear()
 	_players_root = null
@@ -164,11 +248,20 @@ func disconnect_game() -> void:
 	_server_world_ready = false
 	_spawned = false
 	in_game = false
+	_session_active = false
+	_pending_action = ""
+	_client_registration_started = false
+	room_code = ""
+	_last_conn_status = -1
 	_clear_overlay()
+	roster_changed.emit()
+
+
+## Offline mode still uses Godot's OfflineMultiplayerPeer.
 func start_singleplayer(player_name: String) -> void:
 	disconnect_game()
 	offline = true
-	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()   # new
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	local_name = _clean_name(player_name)
 	players = {1: {"name": local_name}}
 	_loaded_peers = {1: true}
@@ -177,13 +270,13 @@ func start_singleplayer(player_name: String) -> void:
 	in_game = true
 	proceed_to_game()
 
-## Leave a running match and go back to the lobby.
+
 func leave_game() -> void:
 	disconnect_game()
 	get_tree().change_scene_to_file(LOBBY_SCENE)
 
 
-## Leader presses Start. Safe to call from any client.
+## The room leader presses Start. Host is normally peer ID 1.
 func start_game() -> void:
 	if not is_online() or in_game:
 		return
@@ -193,21 +286,21 @@ func start_game() -> void:
 		_request_start.rpc_id(1)
 
 
-## Call from the game scene's _ready(), passing the node that holds the
-## players and the MultiplayerSpawner (its Spawn Path must point to that node).
-## Runs on the server too, so the server has the spawner ready.
+## Called by game.gd with the container for players and its MultiplayerSpawner.
 func register_world(players_root: Node, spawner: MultiplayerSpawner) -> void:
 	_players_root = players_root
 	_spawner = spawner
 	_spawner.spawn_function = _spawn_player_func
+
 	if offline or multiplayer.is_server():
 		_server_world_ready = true
+		# Unlike the old dedicated-server setup, the host is a player too.
+		_loaded_peers[my_id()] = true
 		_try_spawn()
 	else:
 		_peer_world_ready.rpc_id(1)
 
 
-## Returns the spawned player node for a peer id, or null.
 func get_player_node(id: int) -> Node:
 	if _players_root == null:
 		return null
@@ -215,13 +308,126 @@ func get_player_node(id: int) -> Node:
 
 
 # ============================================================
-# Connection callbacks
+# Tube + MultiplayerAPI callbacks
 # ============================================================
+func _on_tube_session_created() -> void:
+	if _pending_action != "create":
+		return
+
+	_pending_action = ""
+	_session_active = true
+	dedicated = false
+	room_code = _tube_client.session_id
+	_client_registration_started = false
+	players.clear()
+	players[1] = {"name": local_name}
+	_loaded_peers.clear()
+	_dbg("Room created. Code: " + room_code)
+	roster_changed.emit()
+	room_created.emit(room_code)
+	connection_succeeded.emit()
+
+
+func _on_tube_session_joined() -> void:
+	if _pending_action != "join":
+		# May be a late signal after leaving/cancelling a session.
+		return
+	_pending_action = ""
+	_session_active = true
+	dedicated = false
+	room_code = _tube_client.session_id
+	_dbg("Tube session joined; registering with host...")
+	_finish_client_join()
+
+
+func _on_connected_to_server() -> void:
+	# Godot may signal this just before or after Tube's session_joined signal.
+	# _finish_client_join() prevents duplicate registration in either case.
+	if not _session_active:
+		_session_active = true
+		_pending_action = ""
+		if is_instance_valid(_tube_client):
+			room_code = _tube_client.session_id
+	_finish_client_join()
+
+
+func _finish_client_join() -> void:
+	if not _session_active or offline or multiplayer.is_server():
+		return
+	if _client_registration_started:
+		return
+	_client_registration_started = true
+	_register_client_on_next_frame()
+
+
+func _register_client_on_next_frame() -> void:
+	# Let the WebRTC MultiplayerAPI finish updating peer state before sending RPCs.
+	await get_tree().process_frame
+	if not _session_active or offline or multiplayer.is_server():
+		_client_registration_started = false
+		return
+
+	_dbg("Connected! id=%d, registering as %s" % [multiplayer.get_unique_id(), local_name])
+	_register_player.rpc_id(1, local_name, GAME_VERSION)
+	connection_succeeded.emit()
+
+
+func _on_tube_error_raised(code: int, message: String) -> void:
+	_dbg("Tube error %s: %s" % [str(code), message])
+	if not _pending_action.is_empty():
+		_fail_pending_connection("WebRTC setup failed: " + message)
+
+
+func _on_tube_session_left() -> void:
+	if _suppress_session_left:
+		_suppress_session_left = false
+		return
+	if not _session_active and _pending_action.is_empty():
+		return
+
+	var was_connecting := not _pending_action.is_empty()
+	var was_in_game := in_game
+	_dbg("WebRTC session ended")
+	_clear_local_network_state()
+
+	if was_connecting:
+		connection_failed.emit()
+	else:
+		server_closed.emit()
+	if was_in_game:
+		get_tree().change_scene_to_file(LOBBY_SCENE)
+
+
+func _on_connection_failed() -> void:
+	if not _pending_action.is_empty():
+		_fail_pending_connection("WebRTC connection failed")
+
+
+func _fail_pending_connection(reason: String) -> void:
+	_dbg(reason)
+	if is_instance_valid(_tube_client):
+		_suppress_session_left = true
+		_tube_client.leave_session()
+	_clear_local_network_state()
+	connection_failed.emit()
+
+
+func _on_server_disconnected() -> void:
+	if _suppress_session_left or (not _session_active and not in_game):
+		return
+	var was_in_game := in_game
+	_dbg("Host disconnected")
+	_clear_local_network_state()
+	server_closed.emit()
+	if was_in_game:
+		get_tree().change_scene_to_file(LOBBY_SCENE)
+
+
 func _on_peer_connected(id: int) -> void:
 	_dbg("peer connected: %d" % id)
 	if not multiplayer.is_server():
 		return
-	# No join-in-progress in this version: reject anyone who connects mid-match.
+	# No join-in-progress in this version. Refuse a peer if the match started.
 	if in_game:
 		multiplayer.multiplayer_peer.disconnect_peer(id)
 
@@ -233,46 +439,12 @@ func _on_peer_disconnected(id: int) -> void:
 	_loaded_peers.erase(id)
 	player_left.emit(id)
 	roster_changed.emit()
+
 	if multiplayer.is_server():
 		_sync_roster.rpc(players)
 		var node := get_player_node(id)
-		if node:
-			node.queue_free()  # spawner despawns it on every peer
-		# Everyone left a running match: send the server back to its idle state.
-		if dedicated and in_game and players.is_empty():
-			_reset_server.call_deferred()
-
-
-func _on_connected_to_server() -> void:
-	_dbg("Connected! id=%d, registering as %s" % [multiplayer.get_unique_id(), local_name])
-	_register_player.rpc_id(1, local_name, GAME_VERSION)
-	connection_succeeded.emit()
-
-
-func _on_connection_failed() -> void:
-	_dbg("Connection FAILED: server not found or refused")
-	disconnect_game()
-	connection_failed.emit()
-
-
-func _on_server_disconnected() -> void:
-	_dbg("Server disconnected")
-	var was_in_game := in_game
-	disconnect_game()
-	server_closed.emit()
-	if was_in_game:
-		get_tree().change_scene_to_file(LOBBY_SCENE)
-
-
-func _reset_server() -> void:
-	in_game = false
-	_loaded_peers.clear()
-	_players_root = null
-	_spawner = null
-	_server_world_ready = false
-	_spawned = false
-	get_tree().change_scene_to_file(SERVER_SCENE)
-	print("Match over, server back to lobby state")
+		if node != null:
+			node.queue_free()
 
 
 # ============================================================
@@ -288,6 +460,7 @@ func _register_player(pname: String, version: String) -> void:
 		_dbg("rejected %d (version/full/in_game)" % id)
 		multiplayer.multiplayer_peer.disconnect_peer(id)
 		return
+
 	players[id] = {"name": _clean_name(pname)}
 	_sync_roster.rpc(players)
 	player_joined.emit(id, players[id])
@@ -305,7 +478,7 @@ func _request_start() -> void:
 	if not multiplayer.is_server():
 		return
 	if multiplayer.get_remote_sender_id() != leader_id():
-		return   # only the leader may start
+		return
 	_do_start()
 
 
@@ -323,7 +496,6 @@ func _do_start() -> void:
 func _load_game() -> void:
 	in_game = true
 	game_started.emit()
-	# If nothing is listening (no overlay in this scene, e.g. the server), just go.
 	if show_loading_overlay.get_connections().is_empty():
 		proceed_to_game()
 	else:
@@ -347,8 +519,7 @@ func proceed_to_game() -> void:
 		get_tree().change_scene_to_packed(game_scene_res)
 	else:
 		get_tree().change_scene_to_file(GAME_SCENE)
-		Explosion.warm(self,4)
-	# Safety net so the screen can never get stuck
+		Explosion.warm(self, 4)
 	get_tree().create_timer(15.0).timeout.connect(_clear_overlay)
 
 
@@ -361,9 +532,9 @@ func notify_local_player_ready() -> void:
 	await RenderingServer.frame_post_draw
 	if not is_instance_valid(_loading_layer):
 		return
-	var tw := create_tween()
-	tw.tween_property(loading_overlay, "modulate:a", 0.0, 0.3)
-	tw.tween_callback(_clear_overlay)
+	var tween := create_tween()
+	tween.tween_property(loading_overlay, "modulate:a", 0.0, 0.3)
+	tween.tween_callback(_clear_overlay)
 
 
 func _clear_overlay() -> void:
@@ -382,7 +553,7 @@ func _peer_world_ready() -> void:
 
 
 # ============================================================
-# Spawning (server spawns once its own world AND every player has loaded)
+# Spawning: the host waits for its own world and every player's world.
 # ============================================================
 func _try_spawn() -> void:
 	if _spawned or not _server_world_ready or _spawner == null:
@@ -405,16 +576,17 @@ func _spawn_all() -> void:
 		_spawner.spawn({"id": pid, "pos": pos})
 
 
-# Runs on EVERY peer (set as the spawner's spawn_function).
 func _spawn_player_func(data: Dictionary) -> Node:
 	var scene := player_scene_res if player_scene_res else load(PLAYER_SCENE_PATH)
-	var p: Node3D = (scene as PackedScene).instantiate()
-	p.name = str(data["id"])
-	p.set_multiplayer_authority(data["id"])
-	p.position = data["pos"]
-	return p
+	var player: Node3D = (scene as PackedScene).instantiate()
+	player.name = str(data["id"])
+	player.set_multiplayer_authority(data["id"])
+	player.position = data["pos"]
+	return player
 
 
+# ============================================================
+# Utility / threaded preload
 # ============================================================
 func _clean_name(n: String) -> String:
 	n = n.strip_edges().substr(0, 16)
@@ -424,7 +596,6 @@ func _clean_name(n: String) -> String:
 func preload_assets() -> void:
 	if is_preloading or preload_done:
 		return
-
 	is_preloading = true
 	ResourceLoader.load_threaded_request(GAME_SCENE)
 	ResourceLoader.load_threaded_request(PLAYER_SCENE_PATH)
@@ -447,7 +618,6 @@ func _poll_preload() -> void:
 		player_scene_res = ResourceLoader.load_threaded_get(PLAYER_SCENE_PATH)
 		is_preloading = false
 		preload_done = true
-
 		preload_finished.emit()
 		return
 

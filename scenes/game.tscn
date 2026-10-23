@@ -17,6 +17,7 @@ light_energy = 0.6
 shadow_enabled = true
 directional_shadow_mode = 0
 directional_shadow_max_distance = 40.0
+directional_shadow_pancake_size = 10.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=646461404]
 environment = ExtResource("4_lbhrr")

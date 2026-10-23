@@ -8,7 +8,10 @@ var _idle_frames : int = 0
 var target_position: Vector3 = Vector3.ZERO   # <--- Add this variable near the top with other vars
 const REMOTE_INTERPOLATION_DELAY := 0.10
 const MAX_REMOTE_SNAPSHOTS := 12
+const GRENADE_THROW_ACTION := "fire"   # change if your fire action is named differently
 
+var _grenade_equipped := false
+var _grenade_equipping := false
 var _remote_position_snapshots: Array[Dictionary] = []
 const GRENADE_EXPLOSION = preload(
 	"res://scenes/explosion.tscn"
@@ -18,7 +21,7 @@ const GRENADE_SHOT := "parameters/GrenadeShot/request"
 const GRENADE_FUSE := 3.5            # seconds from the moment you start cooking
 const GRENADE_FP_PAUSE_TIME := 0.15  # seconds into the FP grenade_throw
 const GRENADE_TP_PAUSE_TIME := 0.83   # seconds into the TP throw
-const GRENADE_THROW_SPEED := 12.0
+const GRENADE_THROW_SPEED := 15.0
 const GRENADE_RELEASE_TIME := 0.2    # seconds into the FP throw when it leaves the hand
 var _fp_held := false
 var _tp_held := false
@@ -210,13 +213,65 @@ func _add_debug_kill_button() -> void:
 		if not is_dead:
 			_server_apply_damage(MAX_DAMAGE_PER_HIT, 0))
 	layer.add_child(b)
+func _update_remote_position() -> void:
+	var snapshots := _remote_position_snapshots
 
+	if snapshots.size() < 2:
+		return
+
+	var render_time := (
+		float(Time.get_ticks_usec()) / 1_000_000.0
+		- REMOTE_INTERPOLATION_DELAY
+	)
+
+	# Discard snapshots that are older than necessary.
+	while snapshots.size() > 2:
+		var second_time: float = snapshots[1]["time"]
+
+		if second_time >= render_time:
+			break
+
+		snapshots.pop_front()
+
+	var first_time: float = snapshots[0]["time"]
+	var first_pos: Vector3 = snapshots[0]["position"]
+
+	# The requested render time is before the oldest snapshot.
+	if render_time <= first_time:
+		global_position = first_pos
+		return
+
+	# Find two snapshots surrounding the render time.
+	for i in range(1, snapshots.size()):
+		var previous: Dictionary = snapshots[i - 1]
+		var next: Dictionary = snapshots[i]
+
+		var time_a: float = previous["time"]
+		var time_b: float = next["time"]
+
+		if render_time <= time_b:
+			var pos_a: Vector3 = previous["position"]
+			var pos_b: Vector3 = next["position"]
+
+			var duration := maxf(time_b - time_a, 0.0001)
+			var alpha := clampf(
+				(render_time - time_a) / duration,
+				0.0,
+				1.0
+			)
+
+			global_position = pos_a.lerp(pos_b, alpha)
+			return
+
+	# No newer snapshot is available yet.
+	global_position = snapshots.back()["position"]
 func _process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		_remote_anim(delta)
 		_update_remote_position()
 		return
 	_update_footsteps()
+	process_input()
 
 	if is_moving:
 		# Mute them completely when moving
@@ -580,6 +635,8 @@ func enter_air() -> void:
 	if is_sprinting:
 		is_sprinting = false
 	Input.action_release("sprint")
+	if weapon_holder.is_ads:
+		weapon_holder.exit_ads()
 	_air_weapon_float(velocity.y > 0)
 	is_airborne = true
 	is_landing = false
@@ -985,13 +1042,13 @@ func _request_damage(amount: float) -> void:
 		return
 	_server_apply_damage(amount, multiplayer.get_remote_sender_id())
 
-
-func _server_apply_damage(amount: float, attacker_id: int) -> void:
-	if is_dead or attacker_id == get_multiplayer_authority():
+func _server_apply_damage(amount: float, attacker_id: int, allow_self := false) -> void:
+	if is_dead:
+		return
+	if attacker_id == get_multiplayer_authority() and not allow_self:
 		return
 	health = maxf(health - clampf(amount, 0.0, MAX_DAMAGE_PER_HIT), 0.0)
 	_apply_health.rpc(health, attacker_id)
-
 
 # Server -> everyone (including itself)
 @rpc("any_peer", "call_local", "reliable")
@@ -1014,21 +1071,12 @@ func _die(attacker_id: int) -> void:
 	collision_crouch_walking.disabled = true
 	collision_air.disabled = true
 	current_collision_mode = ""
-
 	if is_multiplayer_authority():
+		cancel_grenade()
 		tps_rig.skeletonIK.start()
 		set_physics_process(false)
 		weapon_holder.hide()
-		weapon_holder.reset_grenade_fp()
 		is_crouching = false
-		_throwing = false
-		_throw_id += 1
-		_fp_held = false
-		_tp_held = false
-		set_grenade_tp_hold(false)
-		anim_tree.set("parameters/GrenadeShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
-		if grenade_label:
-			grenade_label.hide()
 		is_sprinting = false
 		current_crouch_mode = ""
 		sync_crouching = false
@@ -1044,7 +1092,6 @@ func _die(attacker_id: int) -> void:
 			loco.travel("walking")
 	else:
 		tps_rig.hide()
-
 	# Owner sees a countdown, then gets the buttons
 	if is_multiplayer_authority():
 		weapon_holder.hide_grenade_arms()
@@ -1226,12 +1273,96 @@ func _play_footstep() -> void:
 	p.volume_db = -10
 	p.pitch_scale = randf_range(0.95, 1.05) * pitch_mult
 	p.play()
-func _try_throw_grenade() -> void:
-	if _throwing or is_dead or is_airborne or is_landing:
+func process_input() -> void:
+	if not is_multiplayer_authority() or is_dead:
+		return
+
+	if Input.is_action_just_pressed("equip_grenade"):
+		toggle_grenade()
+	elif Input.is_action_just_pressed(GRENADE_THROW_ACTION) and _grenade_equipped:
+		_try_throw_grenade()
+func toggle_grenade() -> void:
+	if not is_multiplayer_authority() or is_dead:
+		return
+	if _grenade_equipped:
+		_unequip_grenade()
+	else:
+		_try_equip_grenade()
+
+func _try_equip_grenade() -> void:
+	if _throwing or _grenade_equipping or _grenade_equipped:
+		return
+	if is_dead or is_airborne or is_landing:
 		return
 	if weapon_holder.is_reloading or weapon_holder.is_ads:
 		return
+
+	_grenade_equipping = true
+	_throw_id += 1
+	var id := _throw_id
+	is_sprinting = false
+	Input.action_release("sprint")
+
+	await weapon_holder.play_weapon_anim("hide")
+	if id != _throw_id:
+		return
+	weapon_holder.show_grenade_arms()
+	_grenade_equipped = true
+	_grenade_equipping = false
+
+func _unequip_grenade() -> void:
+	if _throwing or _grenade_equipping or not _grenade_equipped:
+		return
+	_grenade_equipped = false
+	_grenade_equipping = true   # blocks re-equipping until the equip anim finishes
+	_throw_id += 1
+	var id := _throw_id
+	await weapon_holder.unequip_grenade()
+	if id == _throw_id:
+		_grenade_equipping = false
+
+func cancel_grenade() -> void:
+	_throw_id += 1
+	_throwing = false
+	_grenade_equipped = false
+	_grenade_equipping = false
+	_fp_held = false
+	_tp_held = false
+	if grenade_label:
+		grenade_label.hide()
+	weapon_holder.reset_grenade_fp()
+	weapon_holder.hide_grenade_arms()
+	set_grenade_tp_hold(false)
+	anim_tree.set("parameters/GrenadeShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+	_set_hand(false, true)   # grenade away, weapon back (synced to other peers)func cancel_grenade() -> void:
+	_throw_id += 1
+	_throwing = false
+	_grenade_equipped = false
+	_grenade_equipping = false
+	_fp_held = false
+	_tp_held = false
+	if grenade_label:
+		grenade_label.hide()
+	weapon_holder.reset_grenade_fp()
+	weapon_holder.hide_grenade_arms()
+	set_grenade_tp_hold(false)
+	anim_tree.set("parameters/GrenadeShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+	_set_hand(false, true)   # grenade away, weapon back (synced to other peers)
+
+func _throw_held() -> bool:
+	return Input.is_action_pressed(GRENADE_THROW_ACTION)
+
+
+func _try_throw_grenade() -> void:
+	if _throwing or not _grenade_equipped:
+		return
+	if is_dead or is_airborne or is_landing:
+		return
+	if weapon_holder.is_reloading or weapon_holder.is_ads:
+		return
+
 	_throwing = true
+	_grenade_equipped = false
 
 	tps_rig.skeletonIK.stop()
 	_throw_id += 1
@@ -1241,25 +1372,19 @@ func _try_throw_grenade() -> void:
 	is_sprinting = false
 	Input.action_release("sprint")
 
-	# 1) FP: weapon hides
-	await weapon_holder.play_weapon_anim("hide")
-	if id != _throw_id:
-		return
-	weapon_holder.show_grenade_arms()   # bob_pivot hides, grenade_arms shows
-
-	# 2) Start both throws, each with its OWN pause timer
-
+	# Arms are already showing from equip, so just start the throw anims
 	weapon_holder.start_grenade_fp()
 	play_grenade_tp()
+	_set_hand(true, false) 
 	sync_grenade_throw.rpc()
 
 	get_tree().create_timer(GRENADE_FP_PAUSE_TIME).timeout.connect(func() -> void:
-		if id == _throw_id and Input.is_action_pressed("throw_grenade"):
-			weapon_holder.hold_grenade_fp(GRENADE_FP_PAUSE_TIME)   # was pause_grenade_fp()
+		if id == _throw_id and _throw_held():
+			weapon_holder.hold_grenade_fp(GRENADE_FP_PAUSE_TIME)
 			_fp_held = true)
 
 	get_tree().create_timer(GRENADE_TP_PAUSE_TIME).timeout.connect(func() -> void:
-		if id == _throw_id and Input.is_action_pressed("throw_grenade"):
+		if id == _throw_id and _throw_held():
 			set_grenade_tp_hold(true)
 			sync_grenade_hold.rpc(true)
 			_tp_held = true)
@@ -1267,15 +1392,15 @@ func _try_throw_grenade() -> void:
 	# Wait for both pause points, but stop early if the button is released
 	var t := 0.0
 	var wait := maxf(GRENADE_FP_PAUSE_TIME, GRENADE_TP_PAUSE_TIME) + 0.05
-	while t < wait and Input.is_action_pressed("throw_grenade"):
+	while t < wait and _throw_held():
 		await get_tree().process_frame
 		if id != _throw_id:
 			return
 		t += get_process_delta_time()
 
-	# 3) Cook while both are held and the button stays down
+	# Cook while held and the button stays down
 	var fuse := GRENADE_FUSE
-	while Input.is_action_pressed("throw_grenade") and fuse > 0.0:
+	while _throw_held() and fuse > 0.0:
 		fuse -= get_process_delta_time()
 		if grenade_label:
 			grenade_label.text = "%.1f" % maxf(fuse, 0.0)
@@ -1286,7 +1411,7 @@ func _try_throw_grenade() -> void:
 	if grenade_label:
 		grenade_label.hide()
 
-	# 4) Resume whatever is paused
+	# Resume whatever is paused
 	if _tp_held:
 		set_grenade_tp_hold(false)
 		sync_grenade_hold.rpc(false)
@@ -1305,22 +1430,23 @@ func _try_throw_grenade() -> void:
 	await weapon_holder.resume_grenade_fp()
 	if id != _throw_id:
 		return
-	weapon_holder.hide_grenade_arms()   # opposite: arms hide, bob_pivot shows
+	weapon_holder.hide_grenade_arms()
 
 	await weapon_holder.play_weapon_anim("equip")
 	if id == _throw_id:
 		_throwing = false
+		_set_hand(false, true)      # weapon back
 		tps_rig.skeletonIK.start()
-
 func _on_grenade_release(fuse_left: float) -> void:
+	_set_hand(false, false)
 	var t := camera.global_transform
 	var dir := -t.basis.z
 	var origin = weapon_holder.get_grenade_spawn_position()
 	var vel := dir * GRENADE_THROW_SPEED + Vector3.UP * 2.0 + velocity * 0.5
 	_launch_grenade(origin, vel, fuse_left)
 
-
 func _on_grenade_cooked_off() -> void:
+	_set_hand(false, false)
 	_launch_grenade(global_position + Vector3.UP, Vector3.ZERO, 0.0)
 func _launch_grenade(origin: Vector3, vel: Vector3, fuse_left: float) -> void:
 	if multiplayer.is_server():
@@ -1352,7 +1478,14 @@ func _server_spawn_grenade(origin: Vector3, vel: Vector3, fuse_left: float) -> v
 
 func set_grenade_tp_hold(on: bool) -> void:
 	anim_tree.set("parameters/GrenadeTimeScale/scale", 0.0 if on else 1.0)
+func _set_hand(grenade: bool, weapon: bool) -> void:
+	tps_rig.set_hand_visibility(grenade, weapon)
+	sync_hand.rpc(grenade, weapon)
 
+
+@rpc("authority", "call_remote", "reliable")
+func sync_hand(grenade: bool, weapon: bool) -> void:
+	tps_rig.set_hand_visibility(grenade, weapon)
 
 @rpc("authority", "call_remote", "reliable")
 func sync_grenade_hold(on: bool) -> void:

@@ -334,7 +334,11 @@ func get_grenade_spawn_position() -> Vector3:
 	if grenade_attachment:
 		return grenade_attachment.global_position
 	return player.camera.global_position
-
+## Grenade arms away, weapon back with its equip anim.
+func unequip_grenade() -> void:
+	reset_grenade_fp()
+	hide_grenade_arms()   # grenade_arms hides, bob_pivot shows
+	await play_weapon_anim("equip")
 func _physics_process(_delta: float) -> void:
 	process_weapon_input()
 func process_weapon_input() -> void:
@@ -408,7 +412,7 @@ func _on_reload_start() -> void:
 	is_reloading = false
 
 func _fire_shot() -> void:
-	if current_weapon.weapon_anim_player.is_playing() or wall_check_ray.is_colliding():
+	if current_weapon.weapon_anim_player.is_playing() or wall_check_ray.is_colliding() or player._grenade_equipped:
 		return
 
 	if player.is_sprinting:

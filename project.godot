@@ -40,7 +40,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/StyleboxFancy/plugin.cfg", "res://addons/control_shadows/plugin.cfg", "res://addons/godotx_health_bar/plugin.cfg", "res://addons/mergingmeshes/plugin.cfg", "res://addons/sky_3d/plugin.cfg")
+enabled=PackedStringArray("res://addons/StyleboxFancy/plugin.cfg", "res://addons/control_shadows/plugin.cfg", "res://addons/godotx_health_bar/plugin.cfg", "res://addons/mergingmeshes/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/tube/plugin.cfg")
 
 [global_group]
 
@@ -73,6 +73,10 @@ throw_grenade={
 "deadzone": 0.2,
 "events": []
 }
+equip_grenade={
+"deadzone": 0.2,
+"events": []
+}
 
 [input_devices]
 
@@ -100,6 +104,8 @@ anti_aliasing/quality/msaa_3d=1
 scaling_3d/scale=0.7
 scaling_3d/fsr_sharpness=0.0
 textures/default_filters/texture_mipmap_bias=1.25
+environment/glow/upscale_mode=0
+environment/subsurface_scattering/subsurface_scattering_quality=0
 occlusion_culling/use_occlusion_culling=true
 mesh_lod/lod_change/threshold_pixels=3.0
 lights_and_shadows/positional_shadow/atlas_size=1024

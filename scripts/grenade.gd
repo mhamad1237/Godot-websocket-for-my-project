@@ -1,6 +1,6 @@
 extends RigidBody3D
 
-const DAMAGE := 120.0
+const DAMAGE := 150.0
 const RADIUS := 8
 const MIN_DAMAGE_FRACTION := 0.1
 const GRENADE_INTERPOLATION_DELAY := 0.06
@@ -162,21 +162,25 @@ func _explode() -> void:
 	for id in NetworkManager.players:
 		var p := NetworkManager.get_player_node(id) as Node3D
 		if p == null or p.is_dead:
-			continue
+			print("skip: null/dead ", id); continue
 
 		var target := p.global_position + Vector3.UP
 		var dist := center.distance_to(target)
 		if dist > RADIUS:
-			continue
+			print("skip: too far ", dist); continue
+
 
 		var q := PhysicsRayQueryParameters3D.create(center + Vector3.UP * 0.1, target)
 		q.exclude = [get_rid(), p.get_rid()]
 
 		if not space.intersect_ray(q).is_empty():
 			continue   # a wall is in the way
-
+		var hit := space.intersect_ray(q)
+		if not hit.is_empty():
+			print("blocked by: ", hit.collider); continue
+		print("damaging ", id, " owner_id=", owner_id)
 		var dmg := DAMAGE * lerpf(MIN_DAMAGE_FRACTION, 1.0, 1.0 - dist / RADIUS)
-		p._server_apply_damage(dmg, owner_id)
+		p._server_apply_damage(dmg, owner_id, true)
 
 	_explode_fx.rpc(center)
 	freeze = true
