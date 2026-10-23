@@ -1,0 +1,60 @@
+name: Build Godot iOS
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Godot Engine
+        run: |
+          GODOT_VERSION="4.7-stable"
+          URL="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_macos.universal.zip"
+          curl -L -o godot.zip "$URL"
+          unzip -q godot.zip
+          mv Godot.app /Applications/Godot.app
+          sudo ln -s /Applications/Godot.app/Contents/MacOS/Godot /usr/local/bin/godot
+
+      - name: Install Export Templates
+        run: |
+          TEMPLATE_VERSION="4.7.stable"
+          TEMPLATE_URL="https://github.com/godotengine/godot/releases/download/${TEMPLATE_VERSION}/Godot_v${TEMPLATE_VERSION}_export_templates.tpz"
+          
+          mkdir -p ~/Library/Application\ Support/Godot/export_templates/${TEMPLATE_VERSION}
+          curl -L -o templates.tpz "$TEMPLATE_URL"
+          unzip -q templates.tpz
+          mv templates/* ~/Library/Application\ Support/Godot/export_templates/${TEMPLATE_VERSION}/
+
+      - name: Export Project to Xcode
+        run: |
+          mkdir -p build/ios
+          godot --headless --export-release "iOS" build/ios/GameOutput.xcodeproj
+
+      - name: Build Unsigned iOS Package via Xcode
+        run: |
+          cd build/ios
+          PROJECT_FILE=$(ls -d *.xcodeproj | head -n 1)
+          SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
+
+          xcodebuild -project "$PROJECT_FILE" \
+            -scheme "$SCHEME_NAME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            build CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-output
+          path: build/ios/build/
