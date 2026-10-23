@@ -6,7 +6,7 @@ on:
     tags: ["v*"]
 
 env:
-  GODOT_VERSION: "4.7"
+  GODOT_VERSION: "4.7.1"
   GODOT_CHANNEL: "stable"
   PRESET_NAME: "iOS"     # must match the preset name in export_presets.cfg
   APP_NAME: "mohammads_fps_remake"       # name used for the exported project / scheme
